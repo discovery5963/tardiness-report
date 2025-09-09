@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class SimpleCtrl {
 
-    @RequestMapping("/test")
+    @RequestMapping("/search-detail")
     public String sample() {
-        return "test";
+        return "search-detail";
     }
 }
