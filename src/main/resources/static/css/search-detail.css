@@ -1,14 +1,6 @@
-.search-criteria {
-    padding: 0.5em 1em;
-    margin: 2em 0;
-    height: 60px;
-    border: solid 1px #b8b8b8;
-    display: flex;          /* ← これに変更 */
-    align-items: center;    /* ← 縦中央揃え */
-    gap: 0.5em;             /* ← 入力欄などの隙間を適度に */
-}
 table {
-    border-collapse: collapse
+    border-collapse: collapse;
+    margin: auto;
 }
 
 td {

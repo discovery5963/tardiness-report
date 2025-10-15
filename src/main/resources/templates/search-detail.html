@@ -1,21 +1,84 @@
 <!DOCTYPE html>
-<html>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Select2 -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<html lang="ja">
     <head>
         <meta charset="UTF-8">
         <link rel="stylesheet" href="css/search-detail.css">
         <title>検索・参照</title>
+
+        <!-- 路線選択用 -->
+        <script>
+            $(document).ready(function() {
+                $('#route-select').select2({
+                placeholder: '検索ワードを入力'
+                });
+            });
+
+            $(document).ready(function() {
+                $('#employee-select').select2({
+                placeholder: '検索ワードを入力'
+                });
+            });
+        </script>
     </head>
     <body>
         <table>
             <tr>
-                <td rowspan="2">&nbsp;検索条件&nbsp;</td>
+                <td rowspan="2" style="background-color: rgb(197, 230, 237);">&nbsp;検索条件&nbsp;</td>
                 <td style="border-right: none; border-bottom: none;">開始日</td>
                 <td style="border-right: none; border-left: none; border-bottom: none;">&nbsp;&nbsp;&nbsp;</td>
                 <td style="border-left: none; border-bottom: none;">終了日</td>
+                <td style="border-left: none; border-bottom: none;">路線</td>
+                <td style="border-left: none; border-bottom: none;">社員名称</td>
+            </tr>
             <tr>
                 <td style="border-right: none; border-top: none;">&nbsp;<input type="date" id="start-date">&nbsp;</td>
                 <td style="border-right: none; border-left: none; border-top: none;">&nbsp;-&nbsp;</td>
                 <td style="border-left: none; border-top: none;">&nbsp;<input type="date" id="end-date">&nbsp;</td>
+                <td style="border-top: none;">
+                    &nbsp;
+                    <select id="route-select">
+                        <!-- 路線（仮）最終的にDBから取得したものを表示 -->
+                        <option value="1">JR総武線</option>
+                        <option value="2">JR中央線</option>
+                        <option value="3">JR山手線</option>
+                        <option value="4">JR埼京線</option>
+                        <option value="5">湘南新宿ライン宇須</option>
+                    </select>
+                    &nbsp;
+                </td>
+                <td style="border-top: none;">
+                    &nbsp;
+                    <select id="employee-select">
+                        <!-- 社員名称（仮）最終的にDBから取得したものを表示。権限によって活性、非活性を切り替え -->
+                        <option value="1">松井 一晃</option>
+                        <option value="2">村岡 佳名子</option>
+                        <option value="3">小松 涼美</option>
+                        <option value="4">浜川 海里</option>
+                        <option value="5">添野 一貴</option>
+                    </select>
+                    &nbsp;
+                </td>
+                <td>
+                    検索
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td style="text-align: left;">
+                    &nbsp;
+                    <input type="checkbox" name="other" value="0">その他
+                </td>
             </tr>
         </table>
     </body>
