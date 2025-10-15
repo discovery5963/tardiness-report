@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport"
+			content="width=320,
+			height=480,
+			initial-scale=1.0,
+			minimum-scale=1.0,
+			maximum-scale=2.0,
+			user-scalable=yes" />
+		<title>ログイン</title>
+	</head>
+	<body>
+		<div th:if="${error} == 1 ">
+			<h1 th:text="${errorMessage}">ここにメッセージが表示されます</h1>
+		</div>
+		<h2 align="center">ログイン</h2>
+		<hr/>
+		<div align="center">
+			<form action="/menu" method="POST">
+			<span></span>
+				<table style="width: 300px">
+					<tr>
+						<th>社員ID</th>
+						<td><input type="text" id="empID" name="empID" value="" size="24"></td>
+					</tr>
+					<tr>
+						<th>パスワード</th>
+						<td><input type="password" id="password" name="password" value="" size="24"></td>
+					</tr>
+				</table>
+				<input type="submit" value="ログイン" />
+			</form>
+			
+		</div>
+	</body>
+</html>
