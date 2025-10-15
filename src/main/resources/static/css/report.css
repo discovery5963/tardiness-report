@@ -7,27 +7,54 @@ p{
     margin-bottom: 5px;
 }
 
-.containerUpper{
+.containerWrapper{
     display: flex;
+    width: 100%;
+    justify-content: center;
 }
 
 .format{
-    margin-left: 10%;
+    margin-right: 5%;
 }
 
 .containerMiddle{
-    margin-left: 10%;
+    margin-left: 5%;
+    margin-right: 20%;
 }
 
 .searchButton{
-    margin-top: 53px;
-    margin-left: 10px;
-}
-
-.route{
-
+    text-align: right;
 }
 
 .checkLb{
     display: block;
+}
+
+.inputDetail{
+    width: 250px;
+    height: 100px;
+
+}
+
+.bottom{
+        margin-left: 60%;
+}
+
+.hidden{
+    display: none;
+}
+
+.route{
+    margin-bottom: 10px;
+}
+
+.updateMessage{
+    text-align: center;
+    margin: 0 0;
+}
+
+.confirmDetail{
+    width: 300px;
+    margin-left: auto;
+    margin-right: auto;
 }

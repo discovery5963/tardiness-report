@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
@@ -8,46 +8,108 @@
 </head>
 
 <body>
-    <div>
-        <h1>初回連絡登録</h1>
-    </div>
-    <!-- フォーマット選択、路線検索、検索ボタン -->
-    <div class="containerUpper">
-        <div class="format">
-            <p>フォーマット選択</p>
-            <select name="format" id="format">
-                <option value="train">電車遅延</option>
-                <option value="free">フリーフォーマット</option>
-            </select>
+    <div id="report" class="hidden">
+        <div>
+            <h1>初回連絡登録</h1>
         </div>
-        <div class="containerMiddle">
-            <div>
-                <p>路線検索</p>
-                <input type="text">
+        <!-- フォーマット選択、路線検索、検索ボタン -->
+        <div class="containerWrapper">
+            <div class="format">
+                <p>フォーマット選択</p>
+                <select name="format" id="format">
+                    <option value="train">電車遅延</option>
+                    <option value="free">フリーフォーマット</option>
+                </select>
             </div>
-            <!-- 路線選択チェックボックス -->
-            <div class="route">
-                <label class="checkLb">
-                    <input type="checkbox">山手線
-                </label>
-                <label for="checkLb">
-                    <input type="checkbox">その他
-                </label>
+            <div class="containerMiddle">
+                <div id="train" class="hidden">
+                    <div>
+                        <p>路線検索</p>
+                        <input class="detail" type="text">
+                    </div>
+                    <div class="searchButton">
+                        <button>検索</button>
+                    </div>
+                    <!-- 路線選択チェックボックス -->
+                    <div class="route">
+                        <label class="checkLb">
+                            <input type="checkbox">山手線
+                        </label>
+                        <label for="checkLb">
+                            <input type="checkbox">その他
+                        </label>
+                    </div>
+                    <!-- 内容 -->
+                    <div>
+                        <p>内容</p>
+                        <textarea class="inputDetail">
+電車遅延時間：分
+現場遅刻時間：分
+                </textarea>
+                    </div>
+                </div>
+                <div id="free" class="hidden">
+                    <div>
+                        <p>内容</p>
+                        <textarea class="inputDetail">
+電車遅延時間：分
+現場遅刻時間：分
+                </textarea>
+                    </div>
+                </div>
             </div>
-            <!-- 内容 -->
-            <div class="detail">
-                <input type="text" value="">
-            </div>
-        </div>
-        <div class="searchButton">
-            <button>検索</button>
-        </div>
-    </div>
-    
-    
-    <div>
 
+        </div>
+        <div class="bottom">
+            <div class="registButton">
+                <button>登録</button>
+            </div>
+        </div>
+    </div>
+    <div id="confirm" class="hidden">
+        <h1>
+            登録内容表示
+        </h1>
+        <p class="updateMessage">登録完了しました！</p>
+        <div class="confirmDetail">
+            <div>
+                <p>使用路線</p>
+                <div>〇〇線</div>
+            </div>
+            <div>
+                <p>内容</p>
+                <div>電車遅延時間：＊＊分</div>
+                <div>現場遅刻時間：分</div>
+            </div>
+        </div>
+        <div class="bottom">
+            <div class="registButton">
+                <button>編集</button>
+            </div>
+        </div>
     </div>
 </body>
+
+<script th:inline="javascript">
+    // 登録or確認フラグ
+    const typeFlg = [[${typeFlg}]];
+    // フォーマットフラグ
+    const formatFlg = [[${formatFlg}]];
+    const train = document.getElementById("train");
+    const free = document.getElementById("free");
+    const report = document.getElementById("report");
+    const confirm = document.getElementById("confirm");
+
+    if (typeFlg == 1) {
+        report.classList.remove("hidden");
+        if (formatFlg == 1) {
+            train.classList.remove("hidden");
+        } else if (formatFlg == 2) {
+            free.classList.remove("hidden");
+        }
+    } else if (typeFlg == 2) {
+        confirm.classList.remove("hidden");
+    }
+</script>
 
 </html>
