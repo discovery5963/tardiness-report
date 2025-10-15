@@ -1,0 +1,33 @@
+h1{
+    text-align: center;
+}
+
+p{
+    margin-top: 24px;
+    margin-bottom: 5px;
+}
+
+.containerUpper{
+    display: flex;
+}
+
+.format{
+    margin-left: 10%;
+}
+
+.containerMiddle{
+    margin-left: 10%;
+}
+
+.searchButton{
+    margin-top: 53px;
+    margin-left: 10px;
+}
+
+.route{
+
+}
+
+.checkLb{
+    display: block;
+}

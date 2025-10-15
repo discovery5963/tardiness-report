@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/report.css">
+    <title>報告画面</title>
+</head>
+
+<body>
+    <div>
+        <h1>初回連絡登録</h1>
+    </div>
+    <!-- フォーマット選択、路線検索、検索ボタン -->
+    <div class="containerUpper">
+        <div class="format">
+            <p>フォーマット選択</p>
+            <select name="format" id="format">
+                <option value="train">電車遅延</option>
+                <option value="free">フリーフォーマット</option>
+            </select>
+        </div>
+        <div class="containerMiddle">
+            <div>
+                <p>路線検索</p>
+                <input type="text">
+            </div>
+            <!-- 路線選択チェックボックス -->
+            <div class="route">
+                <label class="checkLb">
+                    <input type="checkbox">山手線
+                </label>
+                <label for="checkLb">
+                    <input type="checkbox">その他
+                </label>
+            </div>
+            <!-- 内容 -->
+            <div class="detail">
+                <input type="text" value="">
+            </div>
+        </div>
+        <div class="searchButton">
+            <button>検索</button>
+        </div>
+    </div>
+    
+    
+    <div>
+
+    </div>
+</body>
+
+</html>
