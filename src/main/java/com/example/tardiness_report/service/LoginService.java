@@ -5,9 +5,12 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
+import com.example.tardiness_report.dao.DbConnect;
 import com.example.tardiness_report.dto.UserDataDto;
 import jakarta.servlet.http.HttpSession;
 import lombok.Data;
@@ -15,6 +18,12 @@ import java.sql.Statement;
 
 @Service
 public class LoginService {
+
+    private DbConnect dbConnect;
+
+    public LoginService(DbConnect dbConnect){
+        this.dbConnect = dbConnect;
+    }
 
     @Data // Lombokでgetterやsetterを自動生成
     public class Neko {
@@ -32,7 +41,11 @@ public class LoginService {
     public boolean getLoginMethod(Map<String, String> loginFormat, HttpSession session,
             Model model) {
 
-
+        //db接続の確認用に作ったもの
+        boolean result = true; 
+        // result = dbConnect.dbCheck();
+        List<String> users = new ArrayList<>();
+        users = loginAccess();
 
         // userDataをDBから取得してきたあたいとして一旦作成(この後削除する記述)
         UserDataDto userData = new UserDataDto();
@@ -73,8 +86,42 @@ public class LoginService {
         return true;
     }
 
+    //後々「DbConnect.java」に移行予定だが、競合などの理由でこちらに置いている。
+        public List<String> loginAccess() {
+             String url = "jdbc:postgresql://160.16.197.189:5432/postgres";
+            String user = "postgres";
+            String conectionPassword = "postgres";
+            System.out.println("接続開始");
+            List<String> loginList = new ArrayList<>();
+            Connection conn = null;
+            try {
+                conn = DriverManager.getConnection(url, user, conectionPassword);
+                System.out.println("接続成功");
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT * FROM team_mst");
+                while (rs.next()) {
+                    System.out.println(rs.getInt("id") + "：" + rs.getString("name"));
+                }
+                
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return loginList;
+            }finally{
+                try{
+                    if (conn != null){
+                    conn.close();
+                    }
+                }catch (SQLException e){
+                    // 例外処理
+                }
+            }
+            return loginList;
+        }
+
+
+        //ほぼいらないがControllerクラスでまだ使っているので…
         public boolean dbCheck() {
-                    String url = "jdbc:postgresql://160.16.197.189:5432/postgres";
+            String url = "jdbc:postgresql://160.16.197.189:5432/postgres";
             String user = "postgres";
             String conectionPassword = "postgres";
             System.out.println("接続開始");
