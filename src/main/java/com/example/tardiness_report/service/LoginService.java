@@ -44,8 +44,8 @@ public class LoginService {
         //db接続の確認用に作ったもの
         boolean result = true; 
         // result = dbConnect.dbCheck();
-        List<String> users = new ArrayList<>();
-        users = loginAccess();
+        // List<String> users = new ArrayList<>();
+        // users = loginAccess();
 
         // userDataをDBから取得してきたあたいとして一旦作成(この後削除する記述)
         UserDataDto userData = new UserDataDto();

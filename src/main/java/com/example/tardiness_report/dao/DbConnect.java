@@ -3,9 +3,10 @@ package com.example.tardiness_report.dao;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import org.springframework.stereotype.Repository;
 
 
-
+@Repository
 public class DbConnect {
     public boolean dbCheck() {
             String url = "jdbc:postgresql://160.16.197.189:5432/postgres";
