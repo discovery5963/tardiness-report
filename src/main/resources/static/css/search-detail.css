@@ -9,3 +9,33 @@ td {
     height: 30px;
     border: solid 1px #b8b8b8;
 }
+
+table.page_link {
+  height: 5px; 
+}
+.page_link td{
+  /* border-style: none; */
+  /* width: 50px; */
+  /* width: 1%; */
+  width: calc(100%/10);
+}
+
+.pagination {
+    display: table-cell;
+    text-align: right;
+}
+
+  .left-align {
+    text-align: left;
+  }
+  .center-align {
+    text-align: center;
+  }
+  .right-align {
+    text-align: right;
+  }
+
+
+
+
+
