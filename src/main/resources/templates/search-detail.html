@@ -12,6 +12,53 @@
         <meta charset="UTF-8">
         <link rel="stylesheet" href="css/search-detail.css">
         <title>検索・参照</title>
+        <style>
+          body {
+            font-family: sans-serif;
+            margin: 20px;
+          }
+          fieldset {
+            border: 2px solid #666;
+            padding: 15px;
+            margin-bottom: 20px;
+          }
+          legend {
+            font-weight: bold;
+            padding: 0 10px;
+          }
+          .search-row {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+          }
+          .form-group {
+            display: flex;
+            flex-direction: column;
+          }
+          label {
+            margin-bottom: 5px;
+            font-weight: bold;
+          }
+          .inline-inputs {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+          }
+          th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+          }
+          .buttons {
+            margin-top: 10px;
+          }
+        </style>
 
         <!-- 路線選択用 -->
         <script>
@@ -29,57 +76,74 @@
         </script>
     </head>
     <body>
+        <fieldset>
+           <legend>検索条件</legend>
+           <div class="search-row">
+             <div class="form-group">
+               <label>期間:</label>
+               <div class="inline-inputs">
+                   <input type="date" id="start-date">&nbsp;-
+                   <input type="date" id="end-date">&nbsp;
+               </div>
+             </div>
+             <div class="form-group">
+             <label>路線:</label>
+               <select id="route-select">
+                     <!-- 路線（仮）最終的にDBから取得したものを表示 -->
+                     <option value="1">JR総武線</option>
+                     <option value="2">JR中央線</option>
+                     <option value="3">JR山手線</option>
+                     <option value="4">JR埼京線</option>
+                     <option value="5">湘南新宿ライン宇須</option>
+               </select>
+               <div class="inline-inputs">
+                   <input type="checkbox" name="other" value="0">その他
+               </div>
+
+             </div>
+             <div class="form-group">
+             <label>社員名称:</label>
+               <select id="route-select">
+               <!-- 社員名称（仮）最終的にDBから取得したものを表示。権限によって活性、非活性を切り替え -->
+                 <option value="1">松井 一晃</option>
+                 <option value="2">村岡 佳名子</option>
+                 <option value="3">小松 涼美</option>
+                 <option value="4">浜川 海里</option>
+                 <option value="5">添野 一貴</option>
+               </select>
+             </div>
+         
+             <div class="form-group">
+               <label>&nbsp;</label>
+               <button>検索</button>
+             </div>
+           </div>
+        </fieldset>
+
+        <span>表示件数: 10　1～10件／〇〇件　ページ: 1/5</span>
+        <button style="float: right;">CSV出力</button>
+
         <table>
+            <thead>
             <tr>
-                <td rowspan="2" style="background-color: rgb(197, 230, 237);">&nbsp;検索条件&nbsp;</td>
-                <td style="border-right: none; border-bottom: none;">開始日</td>
-                <td style="border-right: none; border-left: none; border-bottom: none;">&nbsp;&nbsp;&nbsp;</td>
-                <td style="border-left: none; border-bottom: none;">終了日</td>
-                <td style="border-left: none; border-bottom: none;">路線</td>
-                <td style="border-left: none; border-bottom: none;">社員名称</td>
+                <th>日付</th>
+                <th>社員名</th>
+                <th>理由</th>
+                <th>路線</th>
+                <th>内容</th>
+                <th>操作</th>
             </tr>
+            </thead>
+            <tbody>
             <tr>
-                <td style="border-right: none; border-top: none;">&nbsp;<input type="date" id="start-date">&nbsp;</td>
-                <td style="border-right: none; border-left: none; border-top: none;">&nbsp;-&nbsp;</td>
-                <td style="border-left: none; border-top: none;">&nbsp;<input type="date" id="end-date">&nbsp;</td>
-                <td style="border-top: none;">
-                    &nbsp;
-                    <select id="route-select">
-                        <!-- 路線（仮）最終的にDBから取得したものを表示 -->
-                        <option value="1">JR総武線</option>
-                        <option value="2">JR中央線</option>
-                        <option value="3">JR山手線</option>
-                        <option value="4">JR埼京線</option>
-                        <option value="5">湘南新宿ライン宇須</option>
-                    </select>
-                    &nbsp;
-                </td>
-                <td style="border-top: none;">
-                    &nbsp;
-                    <select id="employee-select">
-                        <!-- 社員名称（仮）最終的にDBから取得したものを表示。権限によって活性、非活性を切り替え -->
-                        <option value="1">松井 一晃</option>
-                        <option value="2">村岡 佳名子</option>
-                        <option value="3">小松 涼美</option>
-                        <option value="4">浜川 海里</option>
-                        <option value="5">添野 一貴</option>
-                    </select>
-                    &nbsp;
-                </td>
-                <td>
-                    検索
-                </td>
+                <td>2025/07/15</td>
+                <td>ACT太郎</td>
+                <td>都営新宿線</td>
+                <td>その他</td>
+                <td>9時新宿駅前に12:00<br>理由: ~~~~</td>
+                <td><button>編集</button></td>
             </tr>
-            <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td style="text-align: left;">
-                    &nbsp;
-                    <input type="checkbox" name="other" value="0">その他
-                </td>
-            </tr>
+            </tbody>
         </table>
     </body>
 </html>
