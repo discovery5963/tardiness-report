@@ -1,9 +1,9 @@
 package com.example.tardiness_report.dto;
 
 public class UserDataDto {
-    private int empID;
-    private int departmentId;
-    private int teamId;
+    private String empID;
+    private String departmentId;
+    private String teamId;
     private String role;
     private String empLname;
     private String empFname;
@@ -12,15 +12,15 @@ public class UserDataDto {
     private String departmentName;
     private String teamName;
 
-    public int getEmpID() {
+    public String getEmpID() {
         return empID;
     }
 
-    public int getDepartmentId() {
+    public String getDepartmentId() {
         return departmentId;
     }
 
-    public int getTeamId() {
+    public String getTeamId() {
         return teamId;
     }
 
@@ -56,15 +56,15 @@ public class UserDataDto {
 
 
     //Setter
-    public void setEmpID(int empID) {
+    public void setEmpID(String empID) {
         this.empID = empID;
     }
 
-    public void setDepartmentId(int departmentId) {
+    public void setDepartmentId(String departmentId) {
         this.departmentId = departmentId;
     }
 
-    public void setTeamId(int teamId) {
+    public void setTeamId(String teamId) {
         this.teamId = teamId;
     }
 

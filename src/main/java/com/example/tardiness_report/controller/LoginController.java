@@ -36,6 +36,12 @@ public class LoginController {
         loginFormat.put("empID", empID);
         loginFormat.put("password", password);
 
+        if(!loginService.dbCheck()){
+            System.out.println("接続失敗");
+            return "login";
+        }
+        
+
         if (!loginService.getLoginMethod(loginFormat, session, model)) {
             model.addAttribute("error", 1);
             return "login";
