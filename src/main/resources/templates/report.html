@@ -8,6 +8,7 @@
 </head>
 
 <body>
+    <form action="/resist" method="post">
     <div id="report" class="hidden">
         <div>
             <h1>初回連絡登録</h1>
@@ -33,39 +34,32 @@
                     <!-- 路線選択チェックボックス -->
                     <div class="route">
                         <label class="checkLb">
-                            <input type="checkbox">山手線
+                            <input type="radio" name="line" value="A">山手線
                         </label>
-                        <label for="checkLb">
-                            <input type="checkbox">その他
+                        <label class="checkLb">
+                            <input type="radio"name="line" value="B" checked>その他
                         </label>
                     </div>
                     <!-- 内容 -->
                     <div>
-                        <p>内容</p>
-                        <textarea class="inputDetail">
-電車遅延時間：分
-現場遅刻時間：分
-                </textarea>
                     </div>
                 </div>
-                <div id="free" class="hidden">
+                <div id="free">
                     <div>
                         <p>内容</p>
-                        <textarea class="inputDetail">
+                        <textarea class="inputDetail" name="inputDetail">
 電車遅延時間：分
 現場遅刻時間：分
                 </textarea>
+                <div>※500文字以内で入力してください。</div>
                     </div>
                 </div>
             </div>
-
         </div>
-        <div class="bottom">
-            <div class="registButton">
-                <button>登録</button>
-            </div>
-        </div>
+            <button class="botton" type="submit">登録</button>
     </div>
+    </form>
+    <form action="/report" method="request">
     <div id="confirm" class="hidden">
         <h1>
             登録内容表示
@@ -74,20 +68,20 @@
         <div class="confirmDetail">
             <div>
                 <p>使用路線</p>
-                <div>〇〇線</div>
+                <div th:text="${line}"></div>
             </div>
             <div>
                 <p>内容</p>
-                <div>電車遅延時間：＊＊分</div>
-                <div>現場遅刻時間：分</div>
+                <textarea readonly class="inputDetail" name="inputDetail" th:text="${inputDetail}"></textarea>
             </div>
         </div>
-        <div class="bottom">
+        <div class="botton">
             <div class="registButton">
-                <button>編集</button>
+                <button type="submit">編集</button>
             </div>
         </div>
     </div>
+    </form>
 </body>
 
 <script th:inline="javascript">
@@ -104,12 +98,29 @@
         report.classList.remove("hidden");
         if (formatFlg == 1) {
             train.classList.remove("hidden");
-        } else if (formatFlg == 2) {
-            free.classList.remove("hidden");
         }
     } else if (typeFlg == 2) {
         confirm.classList.remove("hidden");
     }
+
+    const menu = document.getElementById('format');
+    menu.addEventListener('change', (event) => {
+        const selectedItem = event.target.value;
+        if(selectedItem == "train"){
+            train.classList.remove("hidden");
+        } else if (selectedItem == "free"){
+            train.classList.add("hidden");
+        }
+    });
+    /* 未実装
+    searchWord = function(){
+        var searchResult,
+            searchText = ${this}.val(), // 検索ボックスに入れた値
+            targetText,
+            hitNum;
+    }
+    */
+
 </script>
 
 </html>
