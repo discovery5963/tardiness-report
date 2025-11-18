@@ -76,6 +76,7 @@
         </script>
     </head>
     <body>
+        <form method="post" th:object="${SearchDetailDto}" th:action="@{/search}">
         <fieldset>
            <legend>検索条件</legend>
            <div class="search-row">
@@ -119,11 +120,48 @@
              </div>
            </div>
         </fieldset>
+        </form>
 
-        <span>表示件数: 10　1～10件／〇〇件　ページ: 1/5</span>
-        <button style="float: right;">CSV出力</button>
-
-        <table>
+        <!-- <span>表示件数: 10　1～10件／〇〇件　ページ: 1/5</span> -->
+        <!-- <button style="float: right;">CSV出力</button> -->
+        <table class='page_link'>
+          <tr>
+            <td><div class="left-align">{{.ViewingDataCount}}</div></td>
+            <td><div class="left-align">~</div></td>
+            <td><div class="left-align">{{.ViewingDataCount}}件</div></td>
+            <td><div class="left-align">/</div></td>
+            <td><div class="left-align">{{.AllDataCount}}件</div></td>
+            <td><div class="center-align">表示件数： {{.ViewingDataCount}}</div></td>
+            <td>
+              <div class="right-align">
+                <form  action="SearchResultListBase" target="_parent" method="post">
+                  <input type="submit" disabled id="returnPage" name="page" value="◀" class="btn btn-secondary" />
+                  <input type="hidden" id="screen" name="screen" value="検索結果一覧" />
+                  <input type="hidden" id="searchKeyword" name="searchKeyword" value={{.SearchKeyword}}/>
+                  <input type="hidden" id="numberOfPages" name="numberOfPages" value= ""/>
+                  <input type="hidden" id="action" name="action" value="prev"/>
+                  <input type="hidden" id="returnPageLinkFlg" name="returnPageLinkFlg" value= "{{.ReturnPageLinkFlg}}"/>
+                </form>
+              </td>
+            </div>
+            <td><div class="right-align">1/5</div></td>
+            <td>
+              <div class="right-align">
+                <form  action="SearchResultListBase" target="_parent" method="post">
+                  <input type="submit" id="nextPage" name="page" value="▶" class="btn btn-secondary" />
+                  <input type="hidden" id="screen" name="screen" value="検索結果一覧" />
+                  <input type="hidden" id="searchKeyword" name="searchKeyword" value={{.SearchKeyword}}/>
+                  <input type="hidden" id="numberOfPages" name="numberOfPages" value= ""/>
+                  <input type="hidden" id="action" name="action" value= "next"/>
+                  <input type="hidden" id="nextPageLinkFlg" name="nextPageLinkFlg" value= "{{.NextPageLinkFlg}}"/>
+                </form>
+              </div>
+            </td>
+            <td><button style="float: right;">CSV出力</button></td>
+          </tr>
+        </table>
+      
+        <table class='search_results'>
             <thead>
             <tr>
                 <th>日付</th>
