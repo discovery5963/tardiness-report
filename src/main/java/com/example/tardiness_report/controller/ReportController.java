@@ -23,21 +23,19 @@ public class ReportController {
     public String returnHtml(HttpSession session,
         Model model) {
         // 動作確認用
-        session.setAttribute("emp_id", "0000000002");
+        session.setAttribute("empId", "0000000002");
+        session.setAttribute("lateReasonId", "1");
         
-        model.addAttribute("empId", session.getAttribute("emp_id"));
+        model.addAttribute("empId", session.getAttribute("empId"));
+        model.addAttribute("lateReasonId", session.getAttribute("lateReasonId"));
 
-        reportService.getTodayTardinessRecord(model);
 
-        /*typeFlg 
-         * 1:登録
-         * 2:確認
-         */        
-        if(model.getAttribute("REGISTER_CONTENT_CD").equals(null)){
-            model.addAttribute("typeFlg", 1);
-        } else {
-            model.addAttribute("typeFlg", 2);
-        }        
+        /*
+         * 1:報告画面
+         * 2:編集画面
+         */
+        model.addAttribute("typeFlg", 1);
+
 
         /*formatFlg
          * 1:電車遅延
