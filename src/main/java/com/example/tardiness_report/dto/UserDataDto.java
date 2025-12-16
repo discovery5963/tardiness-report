@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class UserDataDto {
-    private String empID;
+    private String empId;
     private String departmentId;
     private String teamId;
     private String role;
@@ -17,8 +17,8 @@ public class UserDataDto {
     private String departmentName;
     private String teamName;
 
-    public String getEmpID() {
-        return empID;
+    public String getEmpId() {
+        return empId;
     }
 
     public String getDepartmentId() {
@@ -61,8 +61,8 @@ public class UserDataDto {
 
 
     //Setter
-    public void setEmpID(String empID) {
-        this.empID = empID;
+    public void setEmpID(String empId) {
+        this.empId = empId;
     }
 
     public void setDepartmentId(String departmentId) {

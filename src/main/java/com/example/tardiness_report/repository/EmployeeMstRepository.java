@@ -48,7 +48,7 @@ public class EmployeeMstRepository {
 
         for (Map<String, Object> row : rows) {
             UserDataDto dto = UserDataDto.builder()
-                .empID((String) row.get("emp_id"))
+                .empId((String) row.get("emp_id"))
                 .departmentId((String) row.get("department_id"))
                 .teamId((String) row.get("team_id"))
                 .empLname((String) row.get("emp_lname"))
