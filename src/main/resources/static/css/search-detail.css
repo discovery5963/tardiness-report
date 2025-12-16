@@ -14,7 +14,7 @@ table.page_link {
   height: 5px; 
 }
 .page_link td{
-  /* border-style: none; */
+  border-style: none;
   /* width: 50px; */
   /* width: 1%; */
   width: calc(100%/10);

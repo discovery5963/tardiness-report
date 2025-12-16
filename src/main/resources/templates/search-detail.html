@@ -60,10 +60,10 @@
           }
         </style>
 
-        <!-- 路線選択用 -->
+        <!-- 路線・社員名選択用 -->
         <script>
             $(document).ready(function() {
-                $('#route-select').select2({
+                $('#line-select').select2({
                 placeholder: '検索ワードを入力'
                 });
             });
@@ -76,55 +76,62 @@
         </script>
     </head>
     <body>
-        <form method="post" th:object="${SearchDetailDto}" th:action="@{/search}">
+        <form method="post" th:object="${searchDetailDto}" th:action="@{/search}">
         <fieldset>
            <legend>検索条件</legend>
            <div class="search-row">
+            <!-- 期間 -->
              <div class="form-group">
                <label>期間:</label>
                <div class="inline-inputs">
-                   <input type="date" id="start-date">&nbsp;-
-                   <input type="date" id="end-date">&nbsp;
+                   <input type="date" id="start-date" th:field="*{startDate}">&nbsp;-
+                   <input type="date" id="end-date" th:field="*{endDate}">&nbsp;
                </div>
              </div>
+             <!-- 路線 -->
              <div class="form-group">
              <label>路線:</label>
-               <select id="route-select">
+               <select id="line-select" th:field="*{lineIdJoken}">
                      <!-- 路線（仮）最終的にDBから取得したものを表示 -->
-                     <option value="1">JR総武線</option>
+                     <option value="1"></option>
                      <option value="2">JR中央線</option>
                      <option value="3">JR山手線</option>
                      <option value="4">JR埼京線</option>
                      <option value="5">湘南新宿ライン宇須</option>
+                     <option value="6">JR総武線</option>
                </select>
                <div class="inline-inputs">
-                   <input type="checkbox" name="other" value="0">その他
+                   <input type="checkbox" th:field="*{islineOthers}" id="islineOthers" value="true"/>その他
                </div>
 
              </div>
+             <!-- 社員名称 -->
              <div class="form-group">
              <label>社員名称:</label>
-               <select id="route-select">
+               <select id="employee-select" th:field="*{empId}">
                <!-- 社員名称（仮）最終的にDBから取得したものを表示。権限によって活性、非活性を切り替え -->
-                 <option value="1">松井 一晃</option>
-                 <option value="2">村岡 佳名子</option>
-                 <option value="3">小松 涼美</option>
-                 <option value="4">浜川 海里</option>
-                 <option value="5">添野 一貴</option>
+                 <option value="1"></option>
+                 <option value="2">松井 一晃</option>
+                 <option value="3">村岡 佳名子</option>
+                 <option value="4">小松 涼美</option>
+                 <option value="5">浜川 海里</option>
+                 <option value="6">添野 一貴</option>
                </select>
              </div>
          
+             <!-- 検索ボタン -->
              <div class="form-group">
                <label>&nbsp;</label>
                <button>検索</button>
              </div>
            </div>
         </fieldset>
-        </form>
 
+
+        <!-- 初期表示＝falseの場合のみ表示 -->
         <!-- <span>表示件数: 10　1～10件／〇〇件　ページ: 1/5</span> -->
         <!-- <button style="float: right;">CSV出力</button> -->
-        <table class='page_link'>
+        <table class='page_link' th:if="${!isInitial}">
           <tr>
             <td><div class="left-align">{{.ViewingDataCount}}</div></td>
             <td><div class="left-align">~</div></td>
@@ -160,8 +167,10 @@
             <td><button style="float: right;">CSV出力</button></td>
           </tr>
         </table>
+        <!-- 初期表示＝falseの場合のみ表示 -->
       
-        <table class='search_results'>
+        <!-- 初期表示＝falseの場合のみ表示 -->
+        <table class='search_results' th:if="${!isInitial}">
             <thead>
             <tr>
                 <th>日付</th>
@@ -173,15 +182,17 @@
             </tr>
             </thead>
             <tbody>
-            <tr>
-                <td>2025/07/15</td>
-                <td>ACT太郎</td>
-                <td>都営新宿線</td>
-                <td>その他</td>
-                <td>9時新宿駅前に12:00<br>理由: ~~~~</td>
+            <tr th:each="result : ${results}">
+                <td th:text="${result.registeredDate}"></td>
+                <td th:text="${result.empLname}"></td>
+                <td th:text="${result.lateReason}"></td>
+                <td th:text="${result.lineName}"></td>
+                <td th:text="${result.detail}"></td>
                 <td><button>編集</button></td>
             </tr>
             </tbody>
         </table>
+        <!-- 初期表示＝falseの場合のみ表示 -->
+        </form>
     </body>
 </html>
