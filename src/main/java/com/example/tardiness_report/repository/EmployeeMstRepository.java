@@ -17,10 +17,10 @@ public class EmployeeMstRepository {
     private final JdbcTemplate jdbcTemplate;
 
     // 社員情報取得
-    public List<UserDataDto> getEmpData() {
+    public List<UserDataDto> getEmpData(String empID) {
         // TODO
         // 検索対象の社員ID（実装後は引数で検索キーを取得して指定）
-        String empID = "0000000011";
+        // String empID = "0000000011";
 
         String sql = """
             SELECT

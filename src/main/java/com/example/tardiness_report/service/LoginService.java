@@ -26,20 +26,20 @@ public class LoginService {
     @Autowired
     private EmployeeMstRepository employeeMstRepository;
 
-
     private String ERRORMESSAGE = "errorMessage";
 
     private String ERROR = "ユーザIDとパスワードが一致しません";
     private String USER_ID_ERROR = "ユーザIDが空です";
     private String PASSWORD_ERROR = "パスワードが空です";
 
+    // TODO：ごちゃごちゃしてしまったので後でこのメソッドごと削除する
     public boolean getLoginMethod(Map<String, String> loginFormat, HttpSession session,
             Model model) {
 
         // userDataをDBから取得してきたあたいとして一旦作成(この後削除する記述)
         List<UserDataDto> userData = new ArrayList<UserDataDto>();
-        //userData.setPassword("pass");
-        userData = fetchEmployees();
+        // userData.setPassword("pass");
+        // userData = fetchEmployees();
 
         // 画面から取得してきた社員IDとパスワードを格納
         String empID = loginFormat.get("empID");
@@ -57,8 +57,8 @@ public class LoginService {
 
         // 社員IDに一致するパスワードが存在するかチェック
         // if (!userData.getPassword().equals(password)) {
-        //     model.addAttribute(ERRORMESSAGE, ERROR);
-        //     return false;
+        // model.addAttribute(ERRORMESSAGE, ERROR);
+        // return false;
         // }
 
         // DBから取得してきたユーザー情報をセッションに格納する
@@ -77,12 +77,28 @@ public class LoginService {
     }
 
     // ユーザー情報の取得
-    public List<UserDataDto> fetchEmployees() {
-        return employeeMstRepository.getEmpData();
+    public List<UserDataDto> fetchEmployees(String empId) {
+        return employeeMstRepository.getEmpData(empId);
+    }
+
+    public boolean inputDataCheck(List<UserDataDto> userDataList, String password, Model model) {
+
+        // 社員情報のリストの中身やパスワードが空やnullの場合はエラーがメッセージを追加しfalseで返す。
+        if (userDataList.isEmpty() || userDataList == null  || password.isEmpty() || password == null) {
+            model.addAttribute(ERRORMESSAGE, ERROR);
+            return false;
+        }
+
+        String dbPassword = userDataList.get(0).getPassword();
+
+        // 社員情報のパスワードと取得してきたパスワードが違う場合はエラーがメッセージを追加しfalseで返す。
+        if (!password.equals(dbPassword)) {
+            model.addAttribute(ERRORMESSAGE, ERROR);
+            return false;
+        }
+        
+        // チェックOK
+        return true;
     }
 
 }
-
-
-
-
