@@ -4,30 +4,50 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.example.tardiness_report.service.ReportService;
+
 import jakarta.servlet.http.HttpSession;
 
 import org.springframework.ui.Model;
 
 @Controller
 public class ReportController {
+        private final ReportService reportService;
+    
+        public ReportController(ReportService reportService){
+        this.reportService = reportService;
+    }
 
+    //新規登録
     @RequestMapping("/report")
     public String returnHtml(HttpSession session,
         Model model) {
-        session.setAttribute("emp_id", "0000000001");
+        // 動作確認用
+        session.setAttribute("emp_id", "0000000002");
+        
+        model.addAttribute("empId", session.getAttribute("emp_id"));
+
+        reportService.getTodayTardinessRecord(model);
+
         /*typeFlg 
          * 1:登録
          * 2:確認
-         */
-        model.addAttribute("typeFlg", 1);
+         */        
+        if(model.getAttribute("REGISTER_CONTENT_CD").equals(null)){
+            model.addAttribute("typeFlg", 1);
+        } else {
+            model.addAttribute("typeFlg", 2);
+        }        
+
         /*formatFlg
-         * 1: 電車遅延
-         * 2: フリーフォーマット
+         * 1:電車遅延
+         * 2:フリーフォーマット
          */
         model.addAttribute("formatFlg", 1);
         return "report";
     }
 
+    //報告修正
     @PostMapping("/resist")
     public String resistReport(HttpSession session,
         Model model,

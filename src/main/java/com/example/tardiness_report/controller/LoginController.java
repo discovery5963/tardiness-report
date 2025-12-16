@@ -1,22 +1,24 @@
 package com.example.tardiness_report.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import com.example.tardiness_report.service.LoginService;
+import com.example.tardiness_report.dto.UserDataDto;
+
+
 import jakarta.servlet.http.HttpSession;
 import org.springframework.ui.Model;
-
 
 
 @Controller
 public class LoginController {
 
     private final LoginService loginService;
-    
 
     public LoginController(LoginService loginService){
         this.loginService = loginService;
@@ -36,11 +38,10 @@ public class LoginController {
         loginFormat.put("empID", empID);
         loginFormat.put("password", password);
 
-        if(!loginService.dbCheck()){
-            System.out.println("接続失敗");
-            return "login";
-        }
-        
+        // 社員情報取得
+        List<UserDataDto> UserDataList = loginService.fetchEmployees();
+        System.err.println(UserDataList.get(0));
+
 
         if (!loginService.getLoginMethod(loginFormat, session, model)) {
             model.addAttribute("error", 1);
