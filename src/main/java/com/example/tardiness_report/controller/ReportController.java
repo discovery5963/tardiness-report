@@ -10,7 +10,6 @@ import jakarta.servlet.http.HttpSession;
 
 import org.springframework.ui.Model;
 
-@Controller
 public class ReportController {
         private final ReportService reportService;
     
