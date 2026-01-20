@@ -94,11 +94,13 @@
     const report = document.getElementById("report");
     const confirm = document.getElementById("confirm");
 
+    // 登録画面
     if (typeFlg == 1) {
         report.classList.remove("hidden");
         if (formatFlg == 1) {
             train.classList.remove("hidden");
         }
+    // 確認画面
     } else if (typeFlg == 2) {
         confirm.classList.remove("hidden");
     }
