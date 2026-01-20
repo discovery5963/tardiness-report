@@ -2,25 +2,18 @@
 <html xmlns:th="http://www.thymeleaf.org">
 	<head>
 		<meta charset="UTF-8">
-		<meta name="viewport"
-			content="width=320,
-			height=480,
-			initial-scale=1.0,
-			minimum-scale=1.0,
-			maximum-scale=2.0,
-			user-scalable=yes" />
+		<link rel="stylesheet" href="css/report.css">
 		<title>ログイン</title>
 	</head>
-	<body>
+	<body style="text-align: center;">
 		<div th:if="${error} == 1 ">
 			<h1 th:text="${errorMessage}">ここにメッセージが表示されます</h1>
 		</div>
-		<h2 align="center">ログイン</h2>
+		<h2 style="text-align: center;">ログイン</h2>
 		<hr/>
-		<div align="center">
+		<div style="text-align: center;">
 			<form action="/menu" method="POST">
-			<span></span>
-				<table style="width: 300px">
+				<table style="margin: auto;">
 					<tr>
 						<th>社員ID</th>
 						<td><input type="text" id="empID" name="empID" value="" size="24"></td>

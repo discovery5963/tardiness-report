@@ -7,30 +7,15 @@ import lombok.Data;
 @Builder
 public class UserDataDto {
     private String empId;
-    private String departmentId;
-    private String teamId;
-    private String role;
     private String empLname;
     private String empFname;
-    private String belong;
-    private String password;        
-    private String departmentName;
+    private String password;
     private String teamName;
+    private String unitNo;
+    private String roleName;
 
     public String getEmpId() {
         return empId;
-    }
-
-    public String getDepartmentId() {
-        return departmentId;
-    }
-
-    public String getTeamId() {
-        return teamId;
-    }
-
-    public String getRole() {
-        return role;
     }
 
     public String getEmpLname() {
@@ -41,40 +26,25 @@ public class UserDataDto {
         return empFname;
     }
 
-    public String getEelong() {
-        return belong;
-    }
-
     public String getPassword() {
         return password;
-    }
-
-    public String getPepartmentName() {
-        return departmentName;
     }
 
     public String getTeamName() {
         return teamName;
     }
 
+    public String getUnitNo() {
+        return unitNo;
+    }
 
-
+    public String getRoleName() {
+        return roleName;
+    }
 
     //Setter
     public void setEmpID(String empId) {
         this.empId = empId;
-    }
-
-    public void setDepartmentId(String departmentId) {
-        this.departmentId = departmentId;
-    }
-
-    public void setTeamId(String teamId) {
-        this.teamId = teamId;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
     }
 
     public void setEmpLname(String empLname) {
@@ -85,21 +55,20 @@ public class UserDataDto {
         this.empFname = empFname;
     }
 
-    public void setBelong(String belong) {
-        this.belong = belong;
-    }
-
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public void setDepartmentName(String departmentName) {
-        this.departmentName = departmentName;
     }
 
     public void setTeamName(String teamName) {
         this.teamName = teamName;
     }
-    
+
+    public void setUnitNo(String unitNo) {
+        this.unitNo = unitNo;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
+    }
     
 }
