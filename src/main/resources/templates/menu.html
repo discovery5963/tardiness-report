@@ -1,14 +1,15 @@
 <!DOCTYPE html>
-<html lang="ja">
-    <head>
-     <meta charset="UTF-8">
-        <title>メニュー</title>
-    </head>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
+  <head>
+    <meta charset="UTF-8">
+      <title>メニュー</title>
+      <link rel="stylesheet" th:href="@{/css/header.css}">
+  </head>
+
  <body>
-     <div align="center">
-      <p text-indent: 50em;>"aaadd"</p>
-		  <!-- ヘッダーがここに入る -->
-	 </div>
+  <!-- 共通ヘッダー -->
+  <div th:replace="fragments/header :: commonHeader"></div>
    <div align="center">
 		  <h1>メニュー</h1>
 	 </div>
