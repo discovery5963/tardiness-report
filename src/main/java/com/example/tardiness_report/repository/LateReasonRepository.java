@@ -18,13 +18,6 @@ public class LateReasonRepository {
 
     // 遅刻理由IDをキーとしたレコード取得処理
     public List<ReportDataDto> getLateReasonFromlateReasonId(String lateReasonId){
-    /*
-    LocalDateTime now = LocalDateTime.now();
-    // フォーマットを指定
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
-    // 文字列に変換
-    String formattedDate = now.format(formatter);
-    */
     String sql = """
             SELECT
                 T1.late_reason_cd,
@@ -52,15 +45,8 @@ public class LateReasonRepository {
         return result;
     }
 
-        // 遅刻理由IDをキーとしたレコード取得処理
+    // 遅刻理由IDをキーとしたレコード取得処理
     public List<ReportDataDto> getLateReason(String empId){
-    /*
-    LocalDateTime now = LocalDateTime.now();
-    // フォーマットを指定
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
-    // 文字列に変換
-    String formattedDate = now.format(formatter);
-    */
     String sql = """
             SELECT
                 T1.late_reason_cd,
@@ -89,4 +75,34 @@ public class LateReasonRepository {
         return result;
     }
 
+    // レコード登録処理
+    public void insertLateReason(String empId, String lateReasonCd, String registerContentCd, String lineId, String detail){
+    String sql = """
+            INSERT INTO late_reason(
+                LATE_REASON_ID,
+                EMP_ID,
+                LATE_REASON_CD,
+                REGISTER_CONTENT_CD,
+                LINE_ID,
+                DETAIL,
+                UPDATE_DATE,
+                REGISTER_DATE)
+            VALUES(nextval('LATE_REASON_ID_seq'),?,?,?
+                ?,?,to_char(NOW(), 'YYYY-MM-DD HH24:MI:SS'),to_char(NOW(), 'YYYY-MM-DD HH24:MI:SS'))
+            """;
+            jdbcTemplate.queryForList(sql, empId, lateReasonCd, registerContentCd, lineId, detail);
+    }
+    // レコード更新処理
+    public void updateLateReason(String lateReasonCd, String registerContentCd, String lineId, String detail){
+    String sql = """
+            UPDATE LATE_REASON T1
+            SET T1.LATE_REASON_CD = ?,
+            	T1.REGISTER_CONTENT_CD = ?.
+            	T1.LINE_ID = ?,
+            	T1.DETAIL = ?,
+            	T1.UPDATE_DATE = to_char(NOW(), 'YYYY-MM-DD HH24:MI:SS')
+            WHERE LATE_REASON_ID = ?
+            """;
+            jdbcTemplate.queryForList(sql, lateReasonCd, registerContentCd, lineId, detail);
+    }
 }
