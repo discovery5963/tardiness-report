@@ -1,34 +1,39 @@
 package com.example.tardiness_report.controller;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import com.example.tardiness_report.dto.SearchDetailDto;
-import com.example.tardiness_report.service.LoginService;
+
+import com.example.tardiness_report.dto.LineMstDto;
+import com.example.tardiness_report.dto.SearchDetailForm;
+import com.example.tardiness_report.dto.UserDataDto;
+import com.example.tardiness_report.repository.EmployeeMstRepository;
+import com.example.tardiness_report.repository.LineMstRepository;
 import com.example.tardiness_report.service.SearchDetailService;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 
 @Controller
 public class SearchDetailController {
 
     private final SearchDetailService searchDetailService;
+    private final LineMstRepository lineMstRepository;
+    private final EmployeeMstRepository employeeMstRepository;
 
-    public SearchDetailController(SearchDetailService searchDetailService) {
+    /** 1ページあたりの表示件数 */
+    private static final int ITEMS_PER_PAGE = 10;
+
+    public SearchDetailController(SearchDetailService searchDetailService,
+            LineMstRepository lineMstRepository, EmployeeMstRepository employeeMstRepository) {
         this.searchDetailService = searchDetailService;
+        this.lineMstRepository = lineMstRepository;
+        this.employeeMstRepository = employeeMstRepository;
     }
 
-    @ModelAttribute("searchDetailDto")
-    public SearchDetailDto populateSearchDetailDto() {
-        return new SearchDetailDto();
+    @ModelAttribute("searchDetailForm")
+    public SearchDetailForm searchDetailForm() {
+        return new SearchDetailForm();
     }
 
     /**
@@ -39,7 +44,16 @@ public class SearchDetailController {
      */
     @GetMapping("/search")
     public String showDetail(Model model) {
-        model.addAttribute("searchDetailDto", new SearchDetailDto());
+
+        // 路線名の取得
+        List<LineMstDto> lineList = lineMstRepository.getAllLineMstData();
+        model.addAttribute("lineList", lineList); // "lineList"としてhtmlに連携する。
+
+        // 社員リストの取得
+        List<UserDataDto> employeeList = employeeMstRepository.getEmpDataForSearchDetail("4");
+        model.addAttribute("employeeList", employeeList);
+
+        model.addAttribute("searchDetailForm", new SearchDetailForm());
         model.addAttribute("isInitial", true); // 初期表示フラグ
         return "search-detail";
     }
@@ -51,17 +65,49 @@ public class SearchDetailController {
      * @param model モデル
      * @return 検索・参照画面(初期表示)
      */
-    @PostMapping("/search")
-    public String doSearch(@ModelAttribute SearchDetailDto form, Model model) {
-        List<SearchDetailDto> results = searchDetailService.findList(form);
-        form.setSearchedList(results); // 検索結果をDTOにセット
+    @PostMapping(value = "/search", params = "doSearch")
+    public String doSearch(@ModelAttribute SearchDetailForm form, Model model) {
+        form.setCurrentPageNumber(1); // 初期ページ番号を設定
+        // 検索処理結果を格納したリスト
+        // List<SearchDetailForm> results = searchDetailService.findListOld(form);
 
-        model.addAttribute("searchDetailDto", form);
+
+        // 総件数取得
+        List<UserDataDto> allCount = searchDetailService.findList(form);
+        // 表示用にページングされたリストを取得
+        List<UserDataDto> results = searchDetailService.findList(form);
+
+        model.addAttribute("startDate", form);
+        model.addAttribute("searchDetailForm", form);
         model.addAttribute("results", results);
-        model.addAttribute("isInitial", false); // 初期表示フラグ
+        model.addAttribute("isInitial", false); // 初期表示フラグOFF
+        model.addAttribute("currentPageNumber", form.getCurrentPageNumber()); // 現在のページ番号をモデルに追加
         return "search-detail"; // 結果を同じ画面に表示
     }
 
+    /**
+     * 「前へボタン」押下時処理
+     * 
+     * @param form form入力値
+     * @param model モデル
+     * @return 検索・参照画面(初期表示)
+     */
+    @PostMapping(value = "/search", params = "goPrevious")
+    public String goPreviousPage(@ModelAttribute SearchDetailForm form, Model model) {
+
+        form.setCurrentPageNumber(form.getCurrentPageNumber() - 1); // ページ番号を減算
+
+        // 表示用にページングされたリストを取得
+        List<UserDataDto> results = searchDetailService.findList(form);
+
+
+        model.addAttribute("startDate", form);
+        model.addAttribute("searchDetailForm", form);
+        model.addAttribute("results", results);
+        model.addAttribute("isInitial", false); // 初期表示フラグ
+        model.addAttribute("currentPageNumber", form.getCurrentPageNumber()); // 現在のページ番号をモデルに追加
+        return "search-detail"; // 結果を同じ画面に表示
+    }
 
 
     // /**
@@ -80,7 +126,8 @@ public class SearchDetailController {
 
     // // 一覧表示するリストを取得する。
     // @GetMapping(value = {"/search-detail"})
-    // public String getList(@ModelAttribute("SearchDetailDto") SearchDetailDto form, Model model,
+    // public String getList(@ModelAttribute("SearchDetailDto") SearchDetailDto
+    // form, Model model,
     // HttpSession session) {
     // model.addAttribute("title", "一覧");
     // // フラッシュスコープのSearchDetailDtoのプロパティにマップデータを付加する。
@@ -109,7 +156,6 @@ public class SearchDetailController {
     // session.setAttribute("StatusKey", form.getStatusKey());
     // redirectAttributes.addFlashAttribute("SearchDetailDto", form);
 
-
     // // formのmapstringが空の場合はmapitemsをサービスから作成する。
     // // formのmapstringが空でない場合はmapstringをマップに変換する。
     // @SuppressWarnings("unchecked")
@@ -133,7 +179,8 @@ public class SearchDetailController {
     // }
 
     // @GetMapping("/update")
-    // public String getUpdate(@ModelAttribute("SearchDetailDto") SearchDetailDto form, Model model)
+    // public String getUpdate(@ModelAttribute("SearchDetailDto") SearchDetailDto
+    // form, Model model)
     // {
     // model.addAttribute("title", "更新");
     // // HTMLのhidden属性のマップ文字列を取得してローカル変数に格納する。

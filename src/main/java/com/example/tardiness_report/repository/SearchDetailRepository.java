@@ -9,11 +9,11 @@ import com.example.tardiness_report.dto.UserDataDto;
 import lombok.RequiredArgsConstructor;
 
 
-// 社員情報取得用リポジトリクラス
+// 検索・参照画面用マスタデータ取得リポジトリクラス
 
 @Repository
 @RequiredArgsConstructor
-public class EmployeeMstRepository {
+public class SearchDetailRepository {
     private final JdbcTemplate jdbcTemplate;
 
     // 社員情報取得

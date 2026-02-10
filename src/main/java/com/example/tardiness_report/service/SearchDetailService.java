@@ -1,23 +1,19 @@
 package com.example.tardiness_report.service;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
-import com.example.tardiness_report.dto.SearchDetailDto;
+import com.example.tardiness_report.dto.SearchDetailForm;
 import com.example.tardiness_report.dto.UserDataDto;
-import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class SearchDetailService {
 
-    private String ERRORMESSAGE = "errorMessage";
-
-    private String ERROR = "ユーザIDとパスワードが一致しません";
-    private String USER_ID_ERROR = "ユーザIDが空です";
-    private String PASSWORD_ERROR = "パスワードが空です";
+    private final JdbcTemplate jdbcTemplate;
 
     /**
      * 遅刻情報検索
@@ -25,8 +21,8 @@ public class SearchDetailService {
      * @param form
      * @return 検索結果一覧リスト
      */
-    public List<SearchDetailDto> findList(SearchDetailDto form) {
-        List<SearchDetailDto> dummyDataList = new ArrayList<>();
+    public List<SearchDetailForm> findListOld(SearchDetailForm form) {
+        List<SearchDetailForm> dummyDataList = new ArrayList<>();
         form.setRegisteredDate("2024-06-02");
         form.setEmpLname("山田太郎");
         form.setLateReason("寝坊");
@@ -39,53 +35,53 @@ public class SearchDetailService {
         return dummyDataList;
     }
 
+    /**
+     * 遅刻情報一覧取得
+     *
+     * @param form
+     * @return 検索結果一覧リスト
+     */
+    public List<UserDataDto> findList(SearchDetailForm form) {
+
+        String sql = """
+                SELECT
+                    emp.emp_id,
+                    emp.department_id,
+                    emp.team_id,
+                    emp.role,
+                    emp.emp_lname,
+                    emp.emp_fname,
+                    emp.belong,
+                    pass.password,
+                    dep.department_name,
+                    team.team_name
+                FROM employee_mst emp
+                INNER JOIN password_mst pass
+                ON emp.emp_id = pass.emp_id
+                INNER JOIN department_mst dep
+                ON emp.department_id = dep.department_id
+                LEFT JOIN TardinessReport.team_mst team
+                ON emp.team_id = team.team_id
+                WHERE emp.emp_id = '""" + form.getEmpId() + "'";
+
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
+        List<UserDataDto> result = new ArrayList<>();
+
+        for (Map<String, Object> row : rows) {
+            UserDataDto dto = UserDataDto.builder().empId((String) row.get("emp_id"))
+                    .departmentId((String) row.get("department_id"))
+                    .teamId((String) row.get("team_id")).empLname((String) row.get("emp_lname"))
+                    .empFname((String) row.get("emp_fname")).belong((String) row.get("belong"))
+                    .password((String) row.get("password"))
+                    .departmentName((String) row.get("department_name"))
+                    .teamName((String) row.get("team_name")).role((String) row.get("role")).build();
+
+            result.add(dto);
+        }
+
+        return result;
+    }
 
 
-    // public List<Diary> findList(SearchDetailDto form) {
-    // return dao.findList(form);
-    // }
 
-    // public boolean getLoginMethod(Map<String, String> loginFormat, HttpSession session,
-    // Model model) {
-
-    // // userDataをDBから取得してきたあたいとして一旦作成(この後削除する記述)
-    // UserDataDto userData = new UserDataDto();
-    // userData.setPassword("pass");
-
-
-    // // 画面から取得してきた社員IDとパスワードを格納
-    // String empID = loginFormat.get("empID");
-    // String password = loginFormat.get("password");
-
-    // // nullや空のチェック
-    // if (empID == null || empID.isEmpty()) {
-    // model.addAttribute(ERRORMESSAGE, USER_ID_ERROR);
-    // return false;
-    // }
-    // if (password == null || password.isEmpty()) {
-    // model.addAttribute(ERRORMESSAGE, PASSWORD_ERROR);
-    // return false;
-    // }
-
-    // // 社員IDに一致するパスワードが存在するかチェック
-    // if (!userData.getPassword().equals(password)) {
-    // model.addAttribute(ERRORMESSAGE, ERROR);
-    // return false;
-    // }
-
-    // // DBから取得してきたユーザー情報をセッションに格納する
-    // String name = "dummy";
-    // session.setAttribute("empID", name);
-    // session.setAttribute("bushoId", name);
-    // session.setAttribute("teamId", name);
-    // session.setAttribute("position", name);
-    // session.setAttribute("lastName", name);
-    // session.setAttribute("firstName", name);
-    // session.setAttribute("affiliation", name);
-    // session.setAttribute("password", name);
-    // session.setAttribute("bushoName", name);
-    // session.setAttribute("teamName", name);
-
-    // return true;
-    // }
 }
