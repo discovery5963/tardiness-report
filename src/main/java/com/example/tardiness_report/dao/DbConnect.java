@@ -11,7 +11,7 @@ public class DbConnect {
     public boolean dbCheck() {
             String url = "jdbc:postgresql://160.16.197.189:5432/postgres";
             String user = "postgres";
-            String conectionPassword = "postgres";
+            String conectionPassword = "lg82o7o9";
             System.out.println("接続開始");
             try (Connection conn = DriverManager.getConnection(url, user, conectionPassword)) {
                 System.out.println("接続成功！");

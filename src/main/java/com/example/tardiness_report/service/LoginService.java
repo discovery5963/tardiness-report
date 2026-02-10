@@ -1,8 +1,6 @@
 package com.example.tardiness_report.service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,12 +26,25 @@ public class LoginService {
 
     private String ERROR = "社員IDかパスワードが違っております";
 
-    // ユーザー情報の取得
+    // 
+    /**
+     * 入力された社員IDからユーザー情報を取得.
+     *
+     * @param empId 入力された社員ID
+     * @return メニュー画面
+     */
     public List<UserDataDto> fetchEmployees(String empId) {
         return employeeMstRepository.getEmpData(empId);
     }
 
-    // ユーザーIDとパスワードの入力チェック
+    /**
+     * ユーザーIDとパスワードの入力チェックを行う.
+     *
+     * @param userDataList 入力された社員IDに紐づく社員情報
+     * @param password 入力されたパスワード
+     * @param model ログインに失敗した際の値を格納するmodel
+     * @return メニュー画面
+     */
     public boolean inputDataCheck(List<UserDataDto> userDataList, String password, Model model) {
 
         // 社員情報のリストの中身やパスワードが空やnullの場合はエラーがメッセージを追加しfalseで返す。

@@ -76,7 +76,7 @@
         </script>
     </head>
     <body>
-        <form method="post" th:object="${searchDetailDto}" th:action="@{/search}">
+        <form method="post" th:object="${searchDetailForm}" th:action="@{/search}">
         <fieldset>
            <legend>検索条件</legend>
            <div class="search-row">
@@ -91,15 +91,16 @@
              <!-- 路線 -->
              <div class="form-group">
              <label>路線:</label>
-               <select id="line-select" th:field="*{lineIdJoken}">
-                     <!-- 路線（仮）最終的にDBから取得したものを表示 -->
-                     <option value="1"></option>
-                     <option value="2">JR中央線</option>
-                     <option value="3">JR山手線</option>
-                     <option value="4">JR埼京線</option>
-                     <option value="5">湘南新宿ライン宇須</option>
-                     <option value="6">JR総武線</option>
+               <select id="line-select" th:field="*{lineId}">
+                   <option value="選択してください。"></option>
+                   <option
+                       th:each="item : ${lineList}"
+                       th:value="${item.lineId}"
+                       th:text="${item.lineName}"
+                       th:selected="${item.lineId == searchDetailForm.lineId}">
+                   </option>
                </select>
+
                <div class="inline-inputs">
                    <input type="checkbox" th:field="*{islineOthers}" id="islineOthers" value="true"/>その他
                </div>
@@ -109,20 +110,21 @@
              <div class="form-group">
              <label>社員名称:</label>
                <select id="employee-select" th:field="*{empId}">
-               <!-- 社員名称（仮）最終的にDBから取得したものを表示。権限によって活性、非活性を切り替え -->
-                 <option value="1"></option>
-                 <option value="2">松井 一晃</option>
-                 <option value="3">村岡 佳名子</option>
-                 <option value="4">小松 涼美</option>
-                 <option value="5">浜川 海里</option>
-                 <option value="6">添野 一貴</option>
+                   <option value="選択してください。"></option>
+                   <option
+                       th:each="item : ${employeeList}"
+                       th:value="${item.empId}"
+                       th:text="${item.empLname + ' ' + item.empFname}"
+                       th:selected="${item.empId == searchDetailForm.empId}">
+                   </option>
                </select>
              </div>
          
              <!-- 検索ボタン -->
              <div class="form-group">
                <label>&nbsp;</label>
-               <button>検索</button>
+               <!-- <button>検索</button> -->
+               <button type="submit" name="doSearch">検索</button>
              </div>
            </div>
         </fieldset>
@@ -140,28 +142,26 @@
             <td><div class="left-align">{{.AllDataCount}}件</div></td>
             <td><div class="center-align">表示件数： {{.ViewingDataCount}}</div></td>
             <td>
+              <!-- 前へボタン押下時の処理 -->
               <div class="right-align">
-                <form  action="SearchResultListBase" target="_parent" method="post">
-                  <input type="submit" disabled id="returnPage" name="page" value="◀" class="btn btn-secondary" />
-                  <input type="hidden" id="screen" name="screen" value="検索結果一覧" />
+                  <input type="submit" disabled id="previousPage" name="goPrevious" value="◀" class="btn btn-secondary" />
+                  <input type="hidden" id="screen" name="screen" value="検索・参照画面" />
                   <input type="hidden" id="searchKeyword" name="searchKeyword" value={{.SearchKeyword}}/>
-                  <input type="hidden" id="numberOfPages" name="numberOfPages" value= ""/>
+                  <input type="hidden" id="currentPageNumber" name="currentPageNumber" value= ""/>
                   <input type="hidden" id="action" name="action" value="prev"/>
-                  <input type="hidden" id="returnPageLinkFlg" name="returnPageLinkFlg" value= "{{.ReturnPageLinkFlg}}"/>
-                </form>
-              </td>
-            </div>
+                  <input type="hidden" id="previousPageLinkFlg" name="previousPageLinkFlg" value= "{{.PreviousPageLinkFlg}}"/>
+            </td>
+              </div>
             <td><div class="right-align">1/5</div></td>
             <td>
+              <!-- 次へボタン押下時の処理 -->
               <div class="right-align">
-                <form  action="SearchResultListBase" target="_parent" method="post">
-                  <input type="submit" id="nextPage" name="page" value="▶" class="btn btn-secondary" />
-                  <input type="hidden" id="screen" name="screen" value="検索結果一覧" />
+                  <input type="submit" id="nextPage" name="goNext" value="▶" class="btn btn-secondary" />
+                  <input type="hidden" id="screen" name="screen" value="検索・参照画面" />
                   <input type="hidden" id="searchKeyword" name="searchKeyword" value={{.SearchKeyword}}/>
-                  <input type="hidden" id="numberOfPages" name="numberOfPages" value= ""/>
+                  <input type="hidden" id="currentPageNumber" name="currentPageNumber" value= ""/>
                   <input type="hidden" id="action" name="action" value= "next"/>
                   <input type="hidden" id="nextPageLinkFlg" name="nextPageLinkFlg" value= "{{.NextPageLinkFlg}}"/>
-                </form>
               </div>
             </td>
             <td><button style="float: right;">CSV出力</button></td>
@@ -182,12 +182,12 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="result : ${results}">
-                <td th:text="${result.registeredDate}"></td>
-                <td th:text="${result.empLname}"></td>
-                <td th:text="${result.lateReason}"></td>
-                <td th:text="${result.lineName}"></td>
-                <td th:text="${result.detail}"></td>
+            <tr th:each="item : ${results}">
+                <td th:text="${item.registeredDate}"></td>
+                <td th:text="${item.empLname + ' ' + item.empFname}"></td>
+                <td th:text="${item.lateReason}"></td>
+                <td th:text="${item.lineName}"></td>
+                <td th:text="${item.detail}"></td>
                 <td><button>編集</button></td>
             </tr>
             </tbody>
