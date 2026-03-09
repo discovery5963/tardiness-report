@@ -47,9 +47,7 @@
                 <div id="free">
                     <div>
                         <p>内容</p>
-                        <textarea class="inputDetail" name="inputDetail">
-電車遅延時間：分
-現場遅刻時間：分
+                        <textarea class="inputDetail" name="inputDetail" th:text="${inputDetail}">
                 </textarea>
                 <div>※500文字以内で入力してください。</div>
                     </div>
@@ -59,7 +57,7 @@
             <button class="botton" type="submit">登録</button>
     </div>
     </form>
-    <form action="/report" method="request">
+    <form action="/modify" method="post">
     <div id="confirm" class="hidden">
         <h1>
             登録内容表示

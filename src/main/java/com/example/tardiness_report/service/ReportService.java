@@ -25,8 +25,6 @@ public class ReportService {
         } catch(Exception e) {
             errFlg = true;
 
-        } finally{
-            
         }
         return errFlg;
     }
@@ -48,8 +46,29 @@ public class ReportService {
         } catch(Exception e) {
             errFlg = true;
 
-        } finally{
-            
+        }
+        return errFlg;
+    }
+
+    // 登録処理
+    public boolean insertLateReason(Model model){
+        boolean errFlg = false;
+        try{
+            fetchInsertlateReasonId(model);
+        } catch(Exception e) {
+            errFlg = true;
+        }
+        return errFlg;
+    }
+
+    // 更新処理
+    public boolean updateLateReason(){
+        boolean errFlg = false;
+        try{
+
+        } catch(Exception e) {
+            errFlg = true;
+
         }
         return errFlg;
     }
@@ -61,5 +80,24 @@ public class ReportService {
     // 遅刻理由IDにてレコード検索
     public List<ReportDataDto> fetchLateReason(Model model) {
         return lateReasonRepository.getLateReason((String)model.getAttribute("empId"));
+    }
+
+    // 登録処理
+    public void fetchInsertlateReasonId(Model model) {
+        lateReasonRepository.insertLateReason(
+            (String)model.getAttribute("empId"),
+            (String)model.getAttribute("format"),
+            "1",
+            (String)model.getAttribute("line"),
+            (String)model.getAttribute("inputDetail"));
+    }
+
+    // 更新処理
+    public void fetchUpdatelateReasonId(Model model) {
+        lateReasonRepository.updateLateReason(
+            (String)model.getAttribute("format"),
+            "1",
+            (String)model.getAttribute("line"),
+            (String)model.getAttribute("inputDetail"));
     }
 }

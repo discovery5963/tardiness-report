@@ -1,0 +1,46 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background:#7cbeff
+}
+
+
+/* 表 */
+table{
+  border: 2px solid #666;
+  border-collapse: collapse;
+}
+
+table th,
+table td{
+  border: 2px solid #666;
+  border-collapse: collapse;
+}
+
+.header-left {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 4px 12px; /* 行間4px、列間12px */
+}
+
+.label {
+  font-weight: bold;
+  text-align: right;
+}
+
+.value {
+  text-align: left;
+}
+
+/* 見出し */
+.header-center h1 {
+  margin: 0;
+  font-size: 50px;
+}
+
+.header-right {
+  display: flex;
+  gap: 10px;
+}

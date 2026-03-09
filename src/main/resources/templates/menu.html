@@ -1,43 +1,16 @@
 <!DOCTYPE html>
-<html lang="ja">
-    <head>
-      <meta charset="UTF-8">
-      <link rel="stylesheet" href="css/menu.css">
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
+  <head>
+    <meta charset="UTF-8">
       <title>メニュー</title>
-    </head>
+      <link rel="stylesheet" th:href="@{/css/header.css}">
+  </head>
+
  <body>
-     <div style="text-align: center;">
-      <!-- ヘッダーがここに入る　仮で取り敢えず作ってみるか。 -->
-      <p style="font-size: 2.0em;">※ヘッダー想定場所※</p>
-      <div style="display: flex;
-                  justify-content: center;
-                  align-items: center;
-                  gap: 20px;
-                  height: 60px;">
-          <table style="border: 1px solid black">
-            <tr>
-              <th style="border: 1px solid black">名前</th>
-              <td style="border: 1px solid black"><div th:text="${empLname}"></div><div th:text="${empFname}"></div></td>
-            </tr>
-            <tr>
-              <th style="border: 1px solid black">所属</th>
-              <td style="border: 1px solid black"><div th:text="${unitNo}"></div></td>
-            </tr>
-            <tr>
-              <th style="border: 1px solid black">チーム名</th>
-              <td style="border: 1px solid black"><div th:text="${teamName}"></div></td>
-            </tr>
-            <tr>
-              <th style="border: 1px solid black">役職名</th>
-              <td style="border: 1px solid black"><div th:text="${roleName}"></div></td>
-            </tr>
-          </table>
-      <h1>勤怠連絡システム</h1>
-      <div>メニューに戻る</div>
-      </div>
-		  <!-- ヘッダーがここに入る -->
-	 </div>
-   <div style="text-align: center;">
+  <!-- 共通ヘッダー -->
+  <div th:replace="fragments/header :: commonHeader"></div>
+   <div align="center">
 		  <h1>メニュー</h1>
 	 </div>
 
