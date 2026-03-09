@@ -40,7 +40,7 @@ public class ReportController {
     public String returnHtml(HttpSession session,
         Model model) {
         // 動作確認用
-        session.setAttribute("empId", "0000000002");
+        // session.setAttribute("empId", "0000000002");
         // session.setAttribute("lateReasonId", "1");
         boolean errFlg = false;
 
@@ -81,7 +81,6 @@ public class ReportController {
             }
         }
 
-        // nullチェックで「lateReasonCd」をsession内に入れる
         String lateReasonCd =(String) model.getAttribute("lateReasonCd");
         if (lateReasonCd != null) {
             session.setAttribute("lateReasonCd", lateReasonCd);
@@ -129,12 +128,12 @@ public class ReportController {
         @RequestParam("lineId") String lineId,
         @RequestParam("lineName") String lineName
         ){
-        String empId = (String) session.getAttribute("emp_id");
-        if(format == "train"){
+        String empId = (String) session.getAttribute("empId");
+        if("train".equals(format)){
             format = "1";
-        } else if (format == "free"){
+        } else if ("free".equals(format)){
             format = "2";
-        } 
+        }
             /* ログ出力用 */
         final String ID ="社員IDは：";
         final String CODE ="遅刻理由コードは：";
@@ -145,7 +144,7 @@ public class ReportController {
         System.out.println(CODE + format);
         System.out.println(LINE + lineId);
         System.out.println(DETAIL + inputDetail);
-        System.out.println("======logend======");
+        System.out.println("======logSnd======");
         
         session.setAttribute("format", format);
         session.setAttribute("lineId", lineId);
@@ -155,7 +154,7 @@ public class ReportController {
         model.addAttribute("lineName", lineName);
         model.addAttribute("inputDetail", inputDetail);
         model.addAttribute("typeFlg", 2);
-        String lateReasonCd =(String) session.getAttribute("lateReasonCd");
+        String lateReasonCd = format;
 
         System.out.println(lateReasonCd);
         if(session.getAttribute("resistFlg").equals(1)){
