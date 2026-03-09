@@ -8,25 +8,26 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
 import com.example.tardiness_report.dto.LineMstDto;
 import com.example.tardiness_report.dto.SearchDetailForm;
 import com.example.tardiness_report.repository.LineMstRepository;
+import com.example.tardiness_report.repository.LateReasonRepository;
 import com.example.tardiness_report.service.ReportService;
-
 import jakarta.servlet.http.HttpSession;
-
 import org.springframework.ui.Model;
 
 @Controller
 public class ReportController {
         private final ReportService reportService;
         private final LineMstRepository lineMstRepository;
+		private final LateReasonRepository lateReasonRepository;
         private final String INPUT_DETAIL = "電車遅延時間：分\r\n" + "現場遅刻時間：分";
     
-        public ReportController(ReportService reportService, LineMstRepository lineMstRepository){
+        public ReportController(ReportService reportService, LineMstRepository lineMstRepository,
+         LateReasonRepository lateReasonRepository){
         this.reportService = reportService;
         this.lineMstRepository = lineMstRepository;
+		this.lateReasonRepository = lateReasonRepository;
     }
 
     @ModelAttribute("searchDetailForm")
@@ -78,6 +79,12 @@ public class ReportController {
             model.addAttribute("line", model.getAttribute("lineId"));
             System.out.println("log3");
             }
+        }
+
+        // nullチェックで「lateReasonCd」をsession内に入れる
+        String lateReasonCd =(String) model.getAttribute("lateReasonCd");
+        if (lateReasonCd != null) {
+            session.setAttribute("lateReasonCd", lateReasonCd);
         }
     
         // 当日の遅刻レコードが存在する場合には、登録状態に合わせて画面表示させる。
@@ -148,14 +155,15 @@ public class ReportController {
         model.addAttribute("lineName", lineName);
         model.addAttribute("inputDetail", inputDetail);
         model.addAttribute("typeFlg", 2);
+        String lateReasonCd =(String) session.getAttribute("lateReasonCd");
 
-
+        System.out.println(lateReasonCd);
         if(session.getAttribute("resistFlg").equals(1)){
             // INSERT処理
-            
+            lateReasonRepository.insertLateReason(empId,lateReasonCd,format,lineId,inputDetail);
         } else {
             // UPDATE処理
-
+            lateReasonRepository.updateLateReason(lateReasonCd,format,lineId,inputDetail);
         }
 
         return "report";
