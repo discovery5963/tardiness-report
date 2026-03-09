@@ -8,13 +8,13 @@
 
 
 /* 表 */
-table{
+.table-header{
   border: 2px solid #666;
   border-collapse: collapse;
 }
 
-table th,
-table td{
+.table-header th,
+.table-header td{
   border: 2px solid #666;
   border-collapse: collapse;
 }
@@ -23,21 +23,30 @@ table td{
   display: grid;
   grid-template-columns: auto auto;
   gap: 4px 12px; /* 行間4px、列間12px */
+  border: 2px solid #666;
+  border-collapse: collapse;
 }
 
-.label {
+.label-header {
   font-weight: bold;
   text-align: right;
 }
 
-.value {
+.value-header {
   text-align: left;
 }
 
 /* 見出し */
+.header-center {
+  flex: 1;                 /* 中央エリアを広げる */
+  display: flex;           /* 子要素を flex で配置 */
+  justify-content: center; /* 横方向の中央寄せ */
+  align-items: center;     /* 縦方向の中央寄せ */
+}
+
 .header-center h1 {
-  margin: 0;
   font-size: 50px;
+  margin: 0;               /* 余計な余白を消す */
 }
 
 .header-right {

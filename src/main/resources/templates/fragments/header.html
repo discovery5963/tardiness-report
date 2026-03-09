@@ -3,8 +3,9 @@
 
 <body>
 <header class="header" th:fragment="commonHeader">
-    <div class="header-left">
-        <table border="1">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <div class="header-left" th:if="${empId != null}">
+        <table border="1" class="table-header">
             <tr>
                 <th>&nbsp;名　前&nbsp;</th>
                 <td>&nbsp;&nbsp;[[${empLname}]] [[${empFname}]]&nbsp;&nbsp;</td>
@@ -28,12 +29,12 @@
         <h1>勤怠連絡システム</h1>
     </div>
 
-    <div class="header-right">
+    <div class="header-right" th:if="${empId != null}">
         <form action="/menuReturn" method="Get">
-            <input type="submit" value="メニューに戻る" class="button-menu" />
+            <input type="submit" value="メニューに戻る" class="button-menu"/>
         </form>
         <form action="/logout" method="Post">
-            <input type="submit" value="ログアウト" class="button-logout" />
+            <input type="submit" value="ログアウト" class="button-logout"/>
         </form>
     </div>
 </header>

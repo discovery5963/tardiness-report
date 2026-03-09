@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
 	<head>
 		<meta charset="UTF-8">
 		<link rel="stylesheet" href="css/login.css">
@@ -7,6 +7,7 @@
 	</head>
 	
 	<body class="center">
+		<div th:replace="fragments/header :: commonHeader"></div>
 		<div th:if="${error} == 1 ">
 			<h1 th:text="${errorMessage}">ここにメッセージが表示されます</h1>
 		</div>

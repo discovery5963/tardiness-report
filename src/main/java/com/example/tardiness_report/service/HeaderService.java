@@ -1,6 +1,8 @@
 package com.example.tardiness_report.service;
 
 import org.springframework.stereotype.Service;
+
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -16,7 +18,14 @@ public class HeaderService {
      * @param session セッション情報
      */
     @ModelAttribute
-    public static void headerModelSet(Model model, HttpSession session){
+    public static void headerModelSet(Model model, HttpSession session, HttpServletRequest request){
+
+        // ログアウト時は実行しない
+        String uri = request.getRequestURI();
+        if (uri.equals("/logout")) {
+            return;
+        }
+
         // ヘッダー情報をmodelに格納
         model.addAttribute("empId", session.getAttribute("empId"));
         model.addAttribute("empLname", session.getAttribute("empLname"));
