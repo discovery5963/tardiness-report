@@ -30,13 +30,11 @@ public class MenuController {
 
     @GetMapping("/forReport")
     public String moveReport() {
-        System.out.println("reportへ遷移する");
         return "redirect:/report";
     }
 
     @GetMapping("/forSearch")
     public String moveSearch() {
-        System.out.println("searchへ遷移する");
         return "redirect:/search";
     }
 }
