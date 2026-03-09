@@ -47,7 +47,7 @@ public class EmployeeMstRepository {
                     .password((String) row.get("password"))
                     .teamName((String) row.get("team_name"))
                     .unitNo((String) row.get("unit_no"))
-                    .role((String) row.get("role_name")).build();
+                    .roleName((String) row.get("role_name")).build();
             result.add(dto);
         }
 
@@ -84,12 +84,14 @@ public class EmployeeMstRepository {
         for (Map<String, Object> row : rows) {
             UserDataDto dto = UserDataDto.builder().empId((String) row.get("emp_id"))
                     .departmentId((String) row.get("department_id"))
-                    .teamId((String) row.get("team_id")).empLname((String) row.get("emp_lname"))
-                    .empFname((String) row.get("emp_fname")).belong((String) row.get("belong"))
+                    .teamId((String) row.get("team_id"))
+                    .empLname((String) row.get("emp_lname"))
+                    .empFname((String) row.get("emp_fname"))
+                    .belong((String) row.get("belong"))
                     .password((String) row.get("password"))
                     .departmentName((String) row.get("department_name"))
-                    .teamName((String) row.get("team_name")).role((String) row.get("role")).build();
-
+                    .teamName((String) row.get("team_name"))
+                    .role((String) row.get("role")).build();
             result.add(dto);
         }
 
