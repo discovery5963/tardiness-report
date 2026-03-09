@@ -1,13 +1,16 @@
 package com.example.tardiness_report.repository;
 
+import com.example.tardiness_report.dto.SearchDetailDto;
+
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
+
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Repository;
-import com.example.tardiness_report.dto.UserDataDto;
-import lombok.RequiredArgsConstructor;
-
 
 // 検索・参照画面用マスタデータ取得リポジトリクラス
 
@@ -16,91 +19,88 @@ import lombok.RequiredArgsConstructor;
 public class SearchDetailRepository {
     private final JdbcTemplate jdbcTemplate;
 
-    // 社員情報取得
-    public List<UserDataDto> getEmpData(String empID) {
-        // TODO
-        // 検索対象の社員ID（実装後は引数で検索キーを取得して指定）
-        // String empID = "0000000011";
+    /**
+     * 指定した従業員IDに紐づくレコードの総件数を取得する。
+     *
+     * @param empID 検索対象の従業員ID（null不可）
+     * @return 検索結果の総件数
+     * @throws org.springframework.dao.DataAccessException JDBC 操作に失敗した場合にスローされる
+     */
+    public int getAllListCount(String empID) {
 
-        String sql = """
+        String sql =
+                """
                 SELECT
-                    emp.emp_id,
-                    emp.department_id,
-                    emp.team_id,
-                    emp.role,
-                    emp.emp_lname,
-                    emp.emp_fname,
-                    emp.belong,
-                    pass.password,
-                    dep.department_name,
-                    team.team_name
-                FROM employee_mst emp
-                INNER JOIN password_mst pass
-                ON emp.emp_id = pass.emp_id
-                INNER JOIN department_mst dep
-                ON emp.department_id = dep.department_id
-                LEFT JOIN TardinessReport.team_mst team
-                ON emp.team_id = team.team_id
-                WHERE emp.emp_id = '""" + empID + "'";
+                    COUNT(*) AS total_count
+                FROM
+                    LATE_REASON LR
+                    INNER JOIN EMPLOYEE_MST EMP
+                        ON LR.EMP_ID = EMP.EMP_ID
+                    INNER JOIN LINE_MST LM
+                        ON LR.LINE_ID = LM.LINE_ID
+                WHERE
+                    LR.EMP_ID = ?
+                """;
+
+        return jdbcTemplate.queryForObject(sql, Integer.class, empID);
+    }
+
+    /**
+     * 指定した従業員IDに紐づく遅刻理由の一覧をページングして取得する。
+     *
+     * @param empID 検索対象の従業員ID（null不可）
+     * @param limitCount 取得する最大件数（ページサイズ）
+     * @param currentPageNumber 現在のページ番号（1から開始）
+     * @return SearchDetailDto のリスト。該当なしの場合は空リストを返す。
+     * @throws org.springframework.dao.DataAccessException JDBC 操作に失敗した場合にスローされる
+     */
+    public List<SearchDetailDto> getResultList(
+            String empID, int limitCount, int currentPageNumber) {
+
+        // オフセットの計算
+        int offsetValue = (currentPageNumber - 1) * limitCount;
+        // SQLクエリの作成
+        String sql =
+                String.format(
+                        """
+                        SELECT
+                            EMP.EMP_LNAME,
+                            EMP.EMP_FNAME,
+                            LR.REGISTER_DATE,
+                            LR.LATE_REASON_CD,
+                            LR.DETAIL,
+                            LM.LINE_NAME
+                        FROM
+                            LATE_REASON LR
+                            INNER JOIN EMPLOYEE_MST EMP
+                                ON LR.EMP_ID = EMP.EMP_ID
+                            INNER JOIN LINE_MST LM
+                                ON LR.LINE_ID = LM.LINE_ID
+                        WHERE
+                            LR.EMP_ID = '%s'
+                        ORDER BY
+                            REGISTER_DATE
+                        LIMIT %d OFFSET %d
+                        """,
+                        empID, limitCount, offsetValue);
 
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
-        List<UserDataDto> result = new ArrayList<>();
+        List<SearchDetailDto> result = new ArrayList<>();
 
         for (Map<String, Object> row : rows) {
-            UserDataDto dto = UserDataDto.builder().empId((String) row.get("emp_id"))
-                    .departmentId((String) row.get("department_id"))
-                    .teamId((String) row.get("team_id")).empLname((String) row.get("emp_lname"))
-                    .empFname((String) row.get("emp_fname")).belong((String) row.get("belong"))
-                    .password((String) row.get("password"))
-                    .departmentName((String) row.get("department_name"))
-                    .teamName((String) row.get("team_name")).role((String) row.get("role")).build();
+            SearchDetailDto dto =
+                    SearchDetailDto.builder()
+                            .empLname((String) row.get("EMP_LNAME"))
+                            .empFname((String) row.get("EMP_FNAME"))
+                            .registerDate((Timestamp) row.get("REGISTER_DATE"))
+                            .lateReasonCd((String) row.get("LATE_REASON_CD"))
+                            .detail((String) row.get("DETAIL"))
+                            .lineName((String) row.get("LINE_NAME"))
+                            .build();
 
             result.add(dto);
         }
 
         return result;
     }
-
-    // 検索・参照画面用社員情報取得
-    public List<UserDataDto> getEmpDataForSearchDetail(String teamId) {
-
-        String sql = """
-                SELECT
-                    emp.emp_id,
-                    emp.department_id,
-                    emp.team_id,
-                    emp.role,
-                    emp.emp_lname,
-                    emp.emp_fname,
-                    emp.belong,
-                    pass.password,
-                    dep.department_name,
-                    team.team_name
-                FROM employee_mst emp
-                INNER JOIN password_mst pass
-                ON emp.emp_id = pass.emp_id
-                INNER JOIN department_mst dep
-                ON emp.department_id = dep.department_id
-                LEFT JOIN TardinessReport.team_mst team
-                ON emp.team_id = team.team_id
-                WHERE emp.team_id = '""" + teamId + "'";
-
-        List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
-        List<UserDataDto> result = new ArrayList<>();
-
-        for (Map<String, Object> row : rows) {
-            UserDataDto dto = UserDataDto.builder().empId((String) row.get("emp_id"))
-                    .departmentId((String) row.get("department_id"))
-                    .teamId((String) row.get("team_id")).empLname((String) row.get("emp_lname"))
-                    .empFname((String) row.get("emp_fname")).belong((String) row.get("belong"))
-                    .password((String) row.get("password"))
-                    .departmentName((String) row.get("department_name"))
-                    .teamName((String) row.get("team_name")).role((String) row.get("role")).build();
-
-            result.add(dto);
-        }
-
-        return result;
-    }
-
 }
