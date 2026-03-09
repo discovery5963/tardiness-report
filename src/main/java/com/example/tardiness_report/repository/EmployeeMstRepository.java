@@ -24,6 +24,7 @@ public class EmployeeMstRepository {
                     emp.emp_id,
                     emp.emp_lname,
                     emp.emp_fname,
+                    emp.team_id,
                     pass.password,
                     team.team_name,
                     team.unit_no,
@@ -44,6 +45,7 @@ public class EmployeeMstRepository {
             UserDataDto dto = UserDataDto.builder().empId((String) row.get("emp_id"))
                     .empLname((String) row.get("emp_lname"))
                     .empFname((String) row.get("emp_fname"))
+                    .teamId((String) row.get("team_id"))
                     .password((String) row.get("password"))
                     .teamName((String) row.get("team_name"))
                     .unitNo((String) row.get("unit_no"))

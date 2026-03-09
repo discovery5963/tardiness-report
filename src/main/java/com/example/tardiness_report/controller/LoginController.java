@@ -61,6 +61,7 @@ public class LoginController {
         session.setAttribute("empId", userData.getEmpId());
         session.setAttribute("empLname", userData.getEmpLname());
         session.setAttribute("empFname", userData.getEmpFname());
+        session.setAttribute("teamId", userData.getTeamId());
         session.setAttribute("teamName", userData.getTeamName());
         session.setAttribute("unitNo", userData.getUnitNo());
         session.setAttribute("roleName", userData.getRoleName());
