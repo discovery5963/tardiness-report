@@ -2,6 +2,7 @@
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
 	<head>
 		<meta charset="UTF-8">
+		<link rel="stylesheet" href="css/common.css">
 		<link rel="stylesheet" href="css/login.css">
 		<title>ログイン</title>
 	</head>
@@ -12,10 +13,9 @@
 			<h1 th:text="${errorMessage}">ここにメッセージが表示されます</h1>
 		</div>
 		<h2 class="center">ログイン</h2>
-		<hr/>
 		<div class="center">
 			<form action="/forMenu" method="POST">
-				<table class="center">
+				<table class="table-center">
 					<tr>
 						<th>社員ID</th>
 						<td><input type="text" id="empID" name="empID" value="" size="24"></td>

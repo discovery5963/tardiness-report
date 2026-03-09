@@ -22,7 +22,6 @@
 .header-left {
   display: grid;
   grid-template-columns: auto auto;
-  gap: 4px 12px; /* 行間4px、列間12px */
   border: 2px solid #666;
   border-collapse: collapse;
 }
