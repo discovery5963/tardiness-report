@@ -28,20 +28,15 @@
                 <div id="train" class="hidden">
                     <div>
                         <p>路線検索</p>
-                        <input class="detail" type="text">
                     </div>
-                    <div class="searchButton">
-                        <button>検索</button>
-                    </div>
-                    <!-- 路線選択チェックボックス -->
-                    <div class="route">
-                        <label class="checkLb">
-                            <input type="radio" name="line" value="A">山手線
-                        </label>
-                        <label class="checkLb">
-                            <input type="radio"name="line" value="B" checked>その他
-                        </label>
-                    </div>
+                            <select name="lineId" id="line-select">
+                                <option value="">選択してください。</option>
+                                <option 
+                                    th:each="item : ${lineList}"
+                                    th:value="${item.lineId}"
+                                    th:text="${item.lineName}">
+                                </option>
+                            </select>
                     <!-- 内容 -->
                     <div>
                     </div>
@@ -68,7 +63,7 @@
         <div class="confirmDetail">
             <div>
                 <p>使用路線</p>
-                <div th:text="${line}"></div>
+                <div th:text="${lineName}"></div>
             </div>
             <div>
                 <p>内容</p>

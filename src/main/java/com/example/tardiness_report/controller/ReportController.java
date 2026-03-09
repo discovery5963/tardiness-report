@@ -2,10 +2,16 @@ package com.example.tardiness_report.controller;
 
 import java.util.Objects;
 
+import java.util.List;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import com.example.tardiness_report.dto.LineMstDto;
+import com.example.tardiness_report.dto.SearchDetailForm;
+import com.example.tardiness_report.repository.LineMstRepository;
 import com.example.tardiness_report.service.ReportService;
 
 import jakarta.servlet.http.HttpSession;
@@ -15,10 +21,17 @@ import org.springframework.ui.Model;
 @Controller
 public class ReportController {
         private final ReportService reportService;
+        private final LineMstRepository lineMstRepository;
         private final String INPUT_DETAIL = "電車遅延時間：分\r\n" + "現場遅刻時間：分";
     
-        public ReportController(ReportService reportService){
+        public ReportController(ReportService reportService, LineMstRepository lineMstRepository){
         this.reportService = reportService;
+        this.lineMstRepository = lineMstRepository;
+    }
+
+    @ModelAttribute("searchDetailForm")
+    public SearchDetailForm searchDetailForm() {
+        return new SearchDetailForm();
     }
 
     //新規登録
@@ -30,12 +43,25 @@ public class ReportController {
         // session.setAttribute("lateReasonId", "1");
         boolean errFlg = false;
 
+        // 路線名の取得
+        List<LineMstDto> lineList = lineMstRepository.getAllLineMstData();
+        model.addAttribute("lineList", lineList); // "lineList"としてhtmlに連携する。
+        model.addAttribute("lineId", 0000000001);
         // 社員IDをmodelにセット
         model.addAttribute("empId", session.getAttribute("empId"));
         System.out.println("log1");
 
+        String strInputDetail = (String)session.getAttribute("inputDetail");
         // 内容初期化
-        model.addAttribute("inputDetail", INPUT_DETAIL);
+        if(strInputDetail == null){
+            model.addAttribute("inputDetail", INPUT_DETAIL);
+            } else {
+            model.addAttribute("inputDetail", session.getAttribute("inputDetail"));
+            model.addAttribute("line", session.getAttribute("line"));
+            model.addAttribute("format", session.getAttribute("format"));
+            return "report";
+        }
+        
 
         // セッションに遅刻理由IDが含まれている場合、遅刻理由IDから当日の遅刻レコードを検索
         if(!Objects.isNull(session.getAttribute("lateReasonId"))){
@@ -93,7 +119,7 @@ public class ReportController {
         Model model,
         @RequestParam("inputDetail") String inputDetail,
         @RequestParam("format") String format,
-        @RequestParam("line") String line
+        @RequestParam("lineId") String lineId
         ){
         String empId = (String) session.getAttribute("emp_id");
             /* ログ出力用 */
@@ -104,10 +130,15 @@ public class ReportController {
         System.out.println("======logStart======");
         System.out.println(ID + empId);
         System.out.println(CODE + format);
-        System.out.println(LINE + line);
+        System.out.println(LINE + lineId);
         System.out.println(DETAIL + inputDetail);
+        System.out.println("======logend======");
+        
+        session.setAttribute("format", format);
+        session.setAttribute("lineId", lineId);
+        session.setAttribute("inputDetail", inputDetail);
         model.addAttribute("format", format);
-        model.addAttribute("line", line);
+        model.addAttribute("lineId", lineId);
         model.addAttribute("inputDetail", inputDetail);
         model.addAttribute("typeFlg", 2);
 
@@ -125,14 +156,14 @@ public class ReportController {
     // 修正
     @PostMapping("/modify")
     public String modifyReport(HttpSession session,
-        Model model,
-        @RequestParam("inputDetail") String inputDetail,
-        @RequestParam("format") String format,
-        @RequestParam("line") String line){
-        model.addAttribute("format", format);
-        model.addAttribute("line", line);
-        model.addAttribute("inputDetail", inputDetail);
+        Model model){
+        model.addAttribute("format", session.getAttribute("format"));
+        model.addAttribute("lineId", session.getAttribute("lineId"));
+        model.addAttribute("inputDetail", session.getAttribute("inputDetail"));
         model.addAttribute("typeFlg", 1);
+        // 路線名の取得
+        List<LineMstDto> lineList = lineMstRepository.getAllLineMstData();
+        model.addAttribute("lineList", lineList); // "lineList"としてhtmlに連携する。
         return "report";
     }
 }
