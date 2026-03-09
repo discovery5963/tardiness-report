@@ -21,14 +21,26 @@ public class LoginController {
         this.loginService = loginService;
     }
 
-    // 初期表示
+    /**
+     * 初期表示.
+     *
+     * @return ログイン画面
+     */
     @GetMapping("/login")
     public String loginHome() {
         return "login";
     }
 
-    // ログイン処理
-    @PostMapping("/menu")
+    /**
+     * 社員IDとパスワードが入力され、ログインが押下された際の処理.
+     *
+     * @param empID 入力された社員情報
+     * @param password 入力されたパスワード
+     * @param session ログイン成功時に、後続へ社員情報を格納するためsession
+     * @param model ログインに失敗した際の値を格納するmodel
+     * @return メニュー画面
+     */
+    @PostMapping("/forMenu")
     public String getLogin(@RequestParam("empID") String empID, @RequestParam("password") String password,
             HttpSession session, Model model) {
         Map<String, String> loginFormat = new HashMap<>();
@@ -54,8 +66,6 @@ public class LoginController {
         session.setAttribute("roleName", userData.getRoleName());
 
         // 3.4. 下記画面に遷移する。
-        System.out.println("画面遷移OK"); // TODO:確認用、後々削除する記載
-        System.out.println(session.getAttribute("password"));// TODO:確認用、後々削除する記載
-        return "menu";
+        return "redirect:/menu";
     }
 }

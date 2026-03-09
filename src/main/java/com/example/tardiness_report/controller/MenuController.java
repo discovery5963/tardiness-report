@@ -1,17 +1,23 @@
 package com.example.tardiness_report.controller;
 
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.GetMapping;
-
+import org.springframework.stereotype.Controller;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.ui.Model;
 
+@Controller
 public class MenuController {
 
-    // 初期表示
+    /**
+     * 初期表示
+     *
+     * @param model 初期表示に必要な値を格納するmodel
+     * @param session セッション情報
+     * @return メニュー画面
+     */
     @GetMapping("/menu")
     public String showMenu(Model model, HttpSession session) {
-        // TODO:初期表示に必要なのはヘッダー情報のみ
+        // ヘッダー情報の格納
         model.addAttribute("empId", session.getAttribute("empId"));
         model.addAttribute("empLname", session.getAttribute("empLname"));
         model.addAttribute("empFname", session.getAttribute("empFname"));
@@ -22,13 +28,15 @@ public class MenuController {
         return "menu";
     }
 
-    // @PostMapping("/report")
-    // public String moveReport() {
-    //     return "report";
-    // }
+    @GetMapping("/forReport")
+    public String moveReport() {
+        System.out.println("reportへ遷移する");
+        return "redirect:/report";
+    }
 
-    // @PostMapping("/search")
-    // public String moveSearch() {
-    //     return "search";
-    // }
+    @GetMapping("/forSearch")
+    public String moveSearch() {
+        System.out.println("searchへ遷移する");
+        return "redirect:/search";
+    }
 }

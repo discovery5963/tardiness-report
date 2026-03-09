@@ -1,0 +1,13 @@
+h1{
+    text-align: center;
+}
+
+p{
+    margin-top: 24px;
+    margin-bottom: 5px;
+}
+
+.center{
+    text-align: center;
+    margin: auto;
+}

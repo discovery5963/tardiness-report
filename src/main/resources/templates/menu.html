@@ -5,31 +5,23 @@
     <meta charset="UTF-8">
       <title>メニュー</title>
       <link rel="stylesheet" th:href="@{/css/header.css}">
+      <link rel="stylesheet" th:href="@{/css/menu.css}">
   </head>
 
  <body>
-  <!-- 共通ヘッダー -->
   <div th:replace="fragments/header :: commonHeader"></div>
-   <div align="center">
-		  <h1>メニュー</h1>
-	 </div>
+    <div class="center">
+        <h1>メニュー</h1>
+    </div>
 
-   <div style="text-align: center;" class="fixed-bottom text-center">
-    <!-- <form method="post" action="/form">
-    </form> -->
-    <button style="width: 200px; height: 80px; font-size: 2.0em;" onclick="location.href='/report'" >
-      報告
-    </button>
-		<button style="width: 200px; height: 80px; font-size: 2.0em;" onclick="location.href='/search-detail'">
-      参照
-    </button>
-    <!--CSS使えるならこっちを入れたい
-    <button class="button" onclick="location.href='/report'" >
-      報告
-    </button>
-		<button class="button" onclick="location.href='/search-detail'">
-      参照
-    </button> -->
-  </div>
+    <div class="center">
+      <button class="button" onclick="location.href='/forReport'" >
+        報告
+      </button>
+      <button class="button" onclick="location.href='/forSearch'">
+        参照
+      </button> 
+    </div>
+    
   </body>
 </html>
