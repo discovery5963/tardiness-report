@@ -34,9 +34,11 @@
                                 <option 
                                     th:each="item : ${lineList}"
                                     th:value="${item.lineId}"
-                                    th:text="${item.lineName}">
+                                    th:text="${item.lineName}"
+                                    th:attr="data-line-name=${item.lineName}">
                                 </option>
                             </select>
+                            <input type="hidden" name="lineName" id="lineName">
                     <!-- 内容 -->
                     <div>
                     </div>
@@ -89,6 +91,11 @@
     const report = document.getElementById("report");
     const confirm = document.getElementById("confirm");
 
+    document.getElementById("line-select").addEventListener("change", function() {
+    const selected = this.options[this.selectedIndex];
+    document.getElementById("lineName").value = selected.dataset.lineName;
+    });
+
     // 登録画面
     if (typeFlg == 1) {
         report.classList.remove("hidden");
@@ -109,14 +116,6 @@
             train.classList.add("hidden");
         }
     });
-    /* 未実装
-    searchWord = function(){
-        var searchResult,
-            searchText = ${this}.val(), // 検索ボックスに入れた値
-            targetText,
-            hitNum;
-    }
-    */
 
 </script>
 

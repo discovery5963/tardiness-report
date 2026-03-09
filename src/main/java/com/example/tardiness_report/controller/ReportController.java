@@ -119,9 +119,15 @@ public class ReportController {
         Model model,
         @RequestParam("inputDetail") String inputDetail,
         @RequestParam("format") String format,
-        @RequestParam("lineId") String lineId
+        @RequestParam("lineId") String lineId,
+        @RequestParam("lineName") String lineName
         ){
         String empId = (String) session.getAttribute("emp_id");
+        if(format == "train"){
+            format = "1";
+        } else if (format == "free"){
+            format = "2";
+        } 
             /* ログ出力用 */
         final String ID ="社員IDは：";
         final String CODE ="遅刻理由コードは：";
@@ -139,6 +145,7 @@ public class ReportController {
         session.setAttribute("inputDetail", inputDetail);
         model.addAttribute("format", format);
         model.addAttribute("lineId", lineId);
+        model.addAttribute("lineName", lineName);
         model.addAttribute("inputDetail", inputDetail);
         model.addAttribute("typeFlg", 2);
 
@@ -157,7 +164,13 @@ public class ReportController {
     @PostMapping("/modify")
     public String modifyReport(HttpSession session,
         Model model){
-        model.addAttribute("format", session.getAttribute("format"));
+        String format = (String)session.getAttribute("format");
+        if("train".equals(format)){
+            format = "1";
+        } else if ("free".equals(format)){
+            format = "2";
+        } 
+        model.addAttribute("formatFlg", format);
         model.addAttribute("lineId", session.getAttribute("lineId"));
         model.addAttribute("inputDetail", session.getAttribute("inputDetail"));
         model.addAttribute("typeFlg", 1);
