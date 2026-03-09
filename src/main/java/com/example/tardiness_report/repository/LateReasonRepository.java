@@ -74,10 +74,18 @@ public class LateReasonRepository {
         }
         return result;
     }
+    // 遅刻理由コードの最大値取得処理
+    public String getLateReasonId() {
+        String sql = "SELECT COALESCE(MAX(late_reason_id), 0) FROM late_reason";
+
+        return jdbcTemplate.queryForObject(sql, String.class);
+    }
+
 
     // レコード登録処理
     public void insertLateReason(String empId, String lateReasonCd, String registerContentCd, String lineId, String detail){
-    String sql = """
+    String late_reason_id = getLateReasonId();
+        String sql = """
             INSERT INTO late_reason(
                 LATE_REASON_ID,
                 EMP_ID,
@@ -87,11 +95,20 @@ public class LateReasonRepository {
                 DETAIL,
                 UPDATE_DATE,
                 REGISTER_DATE)
-            VALUES(nextval('LATE_REASON_ID_seq'),?,?,?
-                ?,?,to_char(NOW(), 'YYYY-MM-DD HH24:MI:SS'),to_char(NOW(), 'YYYY-MM-DD HH24:MI:SS'))
+            VALUES(?,?,?,?,
+                ?,?,NOW(),NOW())
             """;
-            jdbcTemplate.queryForList(sql, empId, lateReasonCd, registerContentCd, lineId, detail);
-    }
+            jdbcTemplate.update(late_reason_id, sql, empId, lateReasonCd, registerContentCd, lineId, detail);
+            jdbcTemplate.update(
+    sql,
+    empId,
+    lateReasonCd,
+    registerContentCd,
+    lineId,
+    detail
+);
+        }
+    
     // レコード更新処理
     public void updateLateReason(String lateReasonCd, String registerContentCd, String lineId, String detail){
     String sql = """
