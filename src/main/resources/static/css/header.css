@@ -3,7 +3,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 12px 20px;
-  background:#7cbeff
+  background:#b0d5fb
 }
 
 
@@ -43,4 +43,16 @@ table td{
 .header-right {
   display: flex;
   gap: 10px;
+}
+
+/* ボタンデザイン（メニューに戻る） */
+.button-menu{
+  height: 30px;
+  width: 130px;
+}
+
+/* ボタンデザイン（ログアウト） */
+.button-logout{
+  height: 30px;
+  width: 120px;
 }
