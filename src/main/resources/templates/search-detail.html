@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
 
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -12,6 +13,7 @@
         <meta charset="UTF-8">
         <link rel="stylesheet" href="css/search-detail.css">
         <title>検索・参照</title>
+        <link rel="stylesheet" th:href="@{/css/header.css}">
         <style>
           body {
             font-family: sans-serif;
@@ -76,6 +78,7 @@
         </script>
     </head>
     <body>
+        <div th:replace="fragments/header :: commonHeader"></div>
         <form method="post" th:object="${searchDetailForm}" th:action="@{/search}">
         <fieldset>
            <legend>検索条件</legend>
@@ -126,6 +129,9 @@
                <!-- <button>検索</button> -->
                <button type="submit" name="doSearch">検索</button>
              </div>
+             <div th:if="${errorMessage}">
+              <p th:text="${errorMessage}" style="color: #ff0000;"></p>
+             </div>
            </div>
         </fieldset>
 
@@ -136,19 +142,14 @@
         <table class='page_link' th:if="${!isInitial}">
           <tr>
             <td><div class="left-align" style="display: inline-block;" th:text="${viewingDataCount}"></div>/</td>
-            <!-- <td><div class="left-align">~</div></td> -->
-            <!-- <td><div class="left-align">{{.ViewingDataCount}}件</div></td> -->
-            <!-- <td><div class="left-align">/</div></td> -->
             <td><div class="left-align" style="display: inline-block;" th:text="${allCount}"></div>件</td>
-            <!-- <td><div class="center-align">表示件数： {{.ViewingDataCount}}</div></td> -->
-            <td><div class="center-align" th:text="${itemsPerPage}"></div></td>
+            <td><div class="center-align" style="display: inline-block;" th:text="${itemsPerPage}"></div>件</td>
             <td>
               <!-- 前へボタン押下時の処理 -->
               <div class="right-align">
-                  <input type="submit" disabled id="previousPage" name="goPrevious" value="◀" class="btn btn-secondary" />
+                  <input type="submit" id="previousPage" name="goPrevious" value="◀" class="btn btn-secondary" />
                   <!-- <input type="hidden" id="screen" name="screen" value="検索・参照画面" /> -->
-                  <input type="hidden" id="searchKeyword" name="searchKeyword" value={{.SearchKeyword}}/>
-                  <input type="hidden" id="currentPageNumber" name="currentPageNumber" value= ""/>
+                  <input type="hidden" name="currentPageNumber" th:value="${currentPageNumber}" />
                   <input type="hidden" id="action" name="action" value="prev"/>
                   <input type="hidden" id="previousPageLinkFlg" name="previousPageLinkFlg" value= "{{.PreviousPageLinkFlg}}"/>
             </td>
@@ -159,13 +160,12 @@
               <div class="right-align">
                   <input type="submit" id="nextPage" name="goNext" value="▶" class="btn btn-secondary" />
                   <input type="hidden" id="screen" name="screen" value="検索・参照画面" />
-                  <input type="hidden" id="searchKeyword" name="searchKeyword" value={{.SearchKeyword}}/>
-                  <input type="hidden" id="currentPageNumber" name="currentPageNumber" value= ""/>
+                  <input type="hidden" name="currentPageNumber" th:value="${currentPageNumber}" />
                   <input type="hidden" id="action" name="action" value= "next"/>
                   <input type="hidden" id="nextPageLinkFlg" name="nextPageLinkFlg" value= "{{.NextPageLinkFlg}}"/>
               </div>
             </td>
-            <td><button style="float: right;">CSV出力</button></td>
+            <td><button type="submit" name="csvOutput" style="float: right;">CSV出力</button></td>
           </tr>
         </table>
         <!-- 初期表示＝falseの場合のみ表示 -->

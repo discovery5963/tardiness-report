@@ -64,6 +64,7 @@ public class LoginController {
         session.setAttribute("teamId", userData.getTeamId());
         session.setAttribute("teamName", userData.getTeamName());
         session.setAttribute("unitNo", userData.getUnitNo());
+        session.setAttribute("role", userData.getRole());
         session.setAttribute("roleName", userData.getRoleName());
 
         // 3.4. 下記画面に遷移する。

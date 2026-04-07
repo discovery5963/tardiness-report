@@ -28,6 +28,7 @@ public class EmployeeMstRepository {
                     pass.password,
                     team.team_name,
                     team.unit_no,
+                    role.role,
                     role.role_name
                 FROM employee_mst emp
                 INNER JOIN password_mst pass
@@ -49,6 +50,7 @@ public class EmployeeMstRepository {
                     .password((String) row.get("password"))
                     .teamName((String) row.get("team_name"))
                     .unitNo((String) row.get("unit_no"))
+                    .role((String) row.get("role"))
                     .roleName((String) row.get("role_name")).build();
             result.add(dto);
         }

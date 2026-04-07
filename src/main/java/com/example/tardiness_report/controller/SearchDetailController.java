@@ -9,12 +9,16 @@ import com.example.tardiness_report.repository.LineMstRepository;
 import com.example.tardiness_report.repository.SearchDetailRepository;
 import com.example.tardiness_report.service.SearchDetailService;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Controller
@@ -24,6 +28,9 @@ public class SearchDetailController {
     private final LineMstRepository lineMstRepository;
     private final EmployeeMstRepository employeeMstRepository;
     private final SearchDetailRepository searchDetailRepository;
+
+    // エラーメッセージ
+    private String ERRORMESSAGE = "errorMessage";
 
     /** 1ページあたりの表示件数 */
     private static final int ITEMS_PER_PAGE = 10;
@@ -39,9 +46,22 @@ public class SearchDetailController {
         this.searchDetailRepository = searchDetailRepository;
     }
 
+    // form初期化
     @ModelAttribute("searchDetailForm")
     public SearchDetailForm searchDetailForm() {
         return new SearchDetailForm();
+    }
+
+    // 従業員マスタ情報取得
+    @ModelAttribute("employeeList")
+    public List<UserDataDto> getEmployeeList() {
+        return employeeMstRepository.getEmpDataForSearchDetail("4");
+    }
+
+    // 路線マスタ情報取得
+    @ModelAttribute("lineList")
+    public List<LineMstDto> getLineList() {
+        return lineMstRepository.getAllLineMstData();
     }
 
     /**
@@ -75,28 +95,53 @@ public class SearchDetailController {
      */
     @PostMapping(value = "/search", params = "doSearch")
     public String doSearch(@ModelAttribute SearchDetailForm form, Model model) {
-        form.setCurrentPageNumber(1); // 初期ページ番号を設定
+
+        // 開始日・終了日入力チェック（片方しか入力されていない場合エラー）
+        if ((form.getStartDate() != null && !form.getStartDate().isEmpty()) ^
+                (form.getEndDate() != null && !form.getEndDate().isEmpty())){
+            model.addAttribute(ERRORMESSAGE, "日付指定時は開始日付と終了日付はどちらも必須です。");
+            return "search-detail";
+        }
+    	
+    	 // 初期ページ番号を設定
+        form.setCurrentPageNumber(1);
+
         // 検索処理結果を格納したリスト
         // List<SearchDetailForm> results = searchDetailService.findListOld(form);
 
+        String empID = "";
+        if (model.getAttribute("role").equals("1")) {
+            // 一般社員の場合、検索条件の従業員IDに自分の従業員IDをセット
+            empID = String.valueOf(model.getAttribute("empId"));
+        } else {
+            // 一般社員以外の場合、検索条件の従業員IDに入力した値をセット
+            empID = form.getEmpId();
+        }
+
         // 総件数取得
-        int allCount = searchDetailRepository.getAllListCount(form.getEmpId());
+        int allCount =
+                searchDetailRepository.getAllListCount(
+                        String.valueOf(model.getAttribute("role")), empID, form.getLineId(),
+                        form.getStartDate(), form.getEndDate());
         // 表示用にページングされたリストを取得
         List<SearchDetailDto> resultList =
                 searchDetailRepository.getResultList(
-                        form.getEmpId(), ITEMS_PER_PAGE, form.getCurrentPageNumber());
+                        form.getEmpId(),
+                        form.getStartDate(),
+                        form.getEndDate(),
+                        ITEMS_PER_PAGE,
+                        form.getCurrentPageNumber());
 
         int startIndex = (form.getCurrentPageNumber() - 1) * ITEMS_PER_PAGE + 1;
         int endIndex = Math.min(form.getCurrentPageNumber() * ITEMS_PER_PAGE, allCount);
-
+        //formにsetすべきかも（htmlも修正必要・）
         String viewingDataCount = startIndex + "〜" + endIndex + "件";
 
-        model.addAttribute("startDate", form);
-        model.addAttribute("searchDetailForm", form);
-        // model.addAttribute("result", resultList);
+        model.addAttribute("searchDetailForm", form); //これで十分なはず
         model.addAttribute("resultList", resultList);
-        model.addAttribute("allCount", allCount); //
+        model.addAttribute("allCount", allCount); 
         model.addAttribute("isInitial", false); // 初期表示フラグOFF
+  
         model.addAttribute("currentPageNumber", form.getCurrentPageNumber()); // 現在のページ番号をモデルに追加
         model.addAttribute("viewingDataCount", viewingDataCount); // 表示件数をモデルに追加
         model.addAttribute("itemsPerPage", ITEMS_PER_PAGE); // ページ毎の表示件数をモデルに追加
@@ -117,13 +162,14 @@ public class SearchDetailController {
         form.setCurrentPageNumber(form.getCurrentPageNumber() - 1);
 
         // 表示用にページングされたリストを取得
-        List<SearchDetailDto> resultList =
-                searchDetailRepository.getResultList(
-                        form.getEmpId(), ITEMS_PER_PAGE, form.getCurrentPageNumber());
+        // List<SearchDetailDto> resultList =
+        //         searchDetailRepository.getResultList(
+        //                 form.getEmpId(), form.getStartDate()ITEMS_PER_PAGE,
+        // form.getCurrentPageNumber());
 
         model.addAttribute("startDate", form);
         model.addAttribute("searchDetailForm", form);
-        model.addAttribute("resultList", resultList);
+        // model.addAttribute("resultList", resultList);
         model.addAttribute("isInitial", false); // 初期表示フラグ
         model.addAttribute("currentPageNumber", form.getCurrentPageNumber()); // 現在のページ番号をモデルに追加
         return "search-detail"; // 結果を同じ画面に表示
@@ -143,15 +189,34 @@ public class SearchDetailController {
         form.setCurrentPageNumber(form.getCurrentPageNumber() + 1);
 
         // 表示用にページングされたリストを取得
-        List<SearchDetailDto> resultList =
-                searchDetailRepository.getResultList(
-                        form.getEmpId(), ITEMS_PER_PAGE, form.getCurrentPageNumber());
+        // List<SearchDetailDto> resultList =
+        //         searchDetailRepository.getResultList(
+        //                 form.getEmpId(), ITEMS_PER_PAGE, form.getCurrentPageNumber());
 
         model.addAttribute("startDate", form);
         model.addAttribute("searchDetailForm", form);
-        model.addAttribute("resultList", resultList);
+        // model.addAttribute("resultList", resultList);
         model.addAttribute("isInitial", false); // 初期表示フラグ
         model.addAttribute("currentPageNumber", form.getCurrentPageNumber()); // 現在のページ番号をモデルに追加
+        return "search-detail"; // 結果を同じ画面に表示
+    }
+
+    /**
+     * CSV出力ボタン押下時処理
+     *
+     * @param form form入力値
+     * @param model モデル
+     * @return 検索・参照画面(初期表示)
+     */
+    @PostMapping(value = "/search", params = "csvOutput")
+    public String csvOutput(@ModelAttribute SearchDetailForm form, Model model) {
+        // TODO
+        // CSVへ出力するデータを取得する
+        //HttpServletResponse response;
+
+        //List<SearchDetailDto> resultList = searchDetailRepository.getCsvOutputList(form, response);
+
+
         return "search-detail"; // 結果を同じ画面に表示
     }
 
