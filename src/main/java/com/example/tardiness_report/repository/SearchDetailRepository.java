@@ -2,6 +2,7 @@ package com.example.tardiness_report.repository;
 
 import com.example.tardiness_report.dto.SearchDetailDto;
 import com.example.tardiness_report.dto.SearchDetailForm;
+import com.example.tardiness_report.dto.UserDataDto;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -28,7 +29,7 @@ public class SearchDetailRepository {
     private final JdbcTemplate jdbcTemplate;
 
     /**
-     * 指定した従業員IDに紐づくレコードの総件数を取得する。
+     * 指定した検索条件に紐づくレコードの総件数を取得する。
      *
      * @param role ログインユーザーの役職
      * @param empID 検索対象の従業員ID
@@ -46,11 +47,7 @@ public class SearchDetailRepository {
                 SELECT
                     COUNT(*) AS total_count
                 FROM
-                    LATE_REASON LR
-                    INNER JOIN EMPLOYEE_MST EMP
-                        ON LR.EMP_ID = EMP.EMP_ID
-                    INNER JOIN LINE_MST LM
-                        ON LR.LINE_ID = LM.LINE_ID
+                    SEARCH_LIST_VIEW
                 """;
         
         // SQL条件数カウント
@@ -58,7 +55,7 @@ public class SearchDetailRepository {
 
         // 従業員IDが入力されている場合
         if ((empID != null && !empID.isEmpty())) {
-            sql = sql + " WHERE LR.EMP_ID =" + empID + "'";
+            sql = sql + " WHERE EMP_ID = '" + empID + "'";
             count = count + 1;
         }
 
@@ -66,31 +63,29 @@ public class SearchDetailRepository {
         if (lineId != null && !lineId.isEmpty()) {
             if (count == 0) {
                 // 既に指定された条件がない場合
-                sql = sql + " WHERE LR.LINE_ID = '" + lineId +"'";    
+                sql = sql + " WHERE LINE_ID = '" + lineId +"'";    
             } else {
                 //既に指定された条件がある場合
-                sql = sql + " AND LR.LINE_ID = '" + lineId +"'";
+                sql = sql + " AND LINE_ID = '" + lineId +"'";
             }
             count = count + 1;
         }
 
-
         // 開始日付、終了日付に値がある場合
         if ((startDate != null && !startDate.isEmpty()) && (endDate != null && !endDate.isEmpty())) {
-            // 開始日付、終了日付の値確認と日付型への変換
-            // String型からLocalDate型に変換
-            LocalDate startDateLD = LocalDate.parse(startDate, DateTimeFormatter.ofPattern("yyyy/MM/dd"));
-            LocalDate endDateLD = LocalDate.parse(endDate, DateTimeFormatter.ofPattern("yyyy/MM/dd"));
             // SQLに条件を追加
-            sql = sql + "AND "; //TODO 記載途中
+            sql = sql + "AND REGISTER_DATE BETWEEN '" + startDate +"' AND '" + endDate +"'" ;
         }
 
+        // return jdbcTemplate.queryForObject(
+        //         sql,
+        //         new Object[] {empID, lineId, startDate, endDate},
+        //         new int[] {Types.VARCHAR, Types.VARCHAR, Types.DATE, Types.DATE},
+        //         Integer.class);
 
-        return jdbcTemplate.queryForObject(
-                sql,
-                new Object[] {empID, lineId, startDate, endDate},
-                new int[] {Types.VARCHAR, Types.VARCHAR, Types.DATE, Types.DATE},
-                Integer.class);
+        int allCount = jdbcTemplate.queryForObject(sql, int.class);
+
+        return allCount;
     }
 
     /**
@@ -106,15 +101,19 @@ public class SearchDetailRepository {
             String empID,
             String startDate,
             String endDate,
+            String lineId,
             int limitCount,
             int currentPageNumber) {
 
+        // 開始日付、終了日付をLocalDate型に変換
+        LocalDate startDateLD = LocalDate.parse(startDate);
+        LocalDate endDateLD = LocalDate.parse(endDate);
+
         // オフセットの計算
         int offsetValue = (currentPageNumber - 1) * limitCount;
+
         // SQLクエリの作成
-        String sql =
-                String.format(
-                        """
+        String sql ="""
                         SELECT
                             EMP.EMP_LNAME,
                             EMP.EMP_FNAME,
@@ -130,15 +129,15 @@ public class SearchDetailRepository {
                                 ON LR.LINE_ID = LM.LINE_ID
                         WHERE
                             LR.EMP_ID = ?
-                            OR LR.LINE_ID = ?
-                            OR LR.REGISTER_DATE BETWEEN ? AND ?
+                            AND LR.LINE_ID = ?
+                            AND LR.REGISTER_DATE BETWEEN ? AND ?
                         ORDER BY
                             REGISTER_DATE
                         LIMIT %d OFFSET %d
-                        """,
-                        empID, limitCount, offsetValue);
+                        """.formatted(limitCount, offsetValue);
+                        //empID, "0000000060", startDate, endDate, limitCount, offsetValue);
 
-        List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, empID, lineId, startDateLD, endDateLD);
         List<SearchDetailDto> result = new ArrayList<>();
 
         for (Map<String, Object> row : rows) {

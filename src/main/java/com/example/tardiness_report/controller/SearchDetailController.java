@@ -10,6 +10,7 @@ import com.example.tardiness_report.repository.SearchDetailRepository;
 import com.example.tardiness_report.service.SearchDetailService;
 
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -94,7 +95,7 @@ public class SearchDetailController {
      * @return 検索・参照画面(初期表示)
      */
     @PostMapping(value = "/search", params = "doSearch")
-    public String doSearch(@ModelAttribute SearchDetailForm form, Model model) {
+    public String doSearch(@ModelAttribute SearchDetailForm form, Model model, HttpSession session) {
 
         // 開始日・終了日入力チェック（片方しか入力されていない場合エラー）
         if ((form.getStartDate() != null && !form.getStartDate().isEmpty()) ^
@@ -110,9 +111,9 @@ public class SearchDetailController {
         // List<SearchDetailForm> results = searchDetailService.findListOld(form);
 
         String empID = "";
-        if (model.getAttribute("role").equals("1")) {
+        if (session.getAttribute("role").equals("1")) {
             // 一般社員の場合、検索条件の従業員IDに自分の従業員IDをセット
-            empID = String.valueOf(model.getAttribute("empId"));
+            empID = String.valueOf(session.getAttribute("empId"));
         } else {
             // 一般社員以外の場合、検索条件の従業員IDに入力した値をセット
             empID = form.getEmpId();
@@ -129,6 +130,7 @@ public class SearchDetailController {
                         form.getEmpId(),
                         form.getStartDate(),
                         form.getEndDate(),
+                        form.getLineId(),
                         ITEMS_PER_PAGE,
                         form.getCurrentPageNumber());
 

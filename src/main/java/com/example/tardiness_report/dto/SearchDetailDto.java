@@ -10,6 +10,9 @@ import java.sql.Timestamp;
 /** 検索・参照画面DTO */
 public class SearchDetailDto {
 
+    /** 社員ID */
+    private String empId;
+
     /** 登録日時 */
     private Timestamp registerDate;
 
@@ -27,4 +30,7 @@ public class SearchDetailDto {
 
     /** 遅刻詳細 */
     private String detail;
+
+    /** データ総件数 */
+    private int allCount;
 }
