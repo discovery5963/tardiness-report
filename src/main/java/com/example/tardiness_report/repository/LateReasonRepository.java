@@ -75,39 +75,41 @@ public class LateReasonRepository {
         return result;
     }
     // 遅刻理由コードの最大値取得処理
-    public String getLateReasonId() {
-        String sql = "SELECT COALESCE(MAX(late_reason_id), 0) FROM late_reason";
-
-        return jdbcTemplate.queryForObject(sql, String.class);
+    public long getLateReasonId() {
+        String sql = "SELECT COALESCE(MAX(late_reason_id), 0) + 1 FROM late_reason";
+        long result = Long.parseLong(jdbcTemplate.queryForObject(sql, String.class));
+        return result;
     }
 
 
-    // レコード登録処理
-    public void insertLateReason(String empId, String lateReasonCd, String registerContentCd, String lineId, String detail){
-    String late_reason_id = getLateReasonId();
-        String sql = """
-            INSERT INTO late_reason(
-                LATE_REASON_ID,
-                EMP_ID,
-                LATE_REASON_CD,
-                REGISTER_CONTENT_CD,
-                LINE_ID,
-                DETAIL,
-                UPDATE_DATE,
-                REGISTER_DATE)
-            VALUES(?,?,?,?,
-                ?,?,NOW(),NOW())
-            """;
-            jdbcTemplate.update(late_reason_id, sql, empId, lateReasonCd, registerContentCd, lineId, detail);
-            jdbcTemplate.update(
-    sql,
-    empId,
-    lateReasonCd,
-    registerContentCd,
-    lineId,
-    detail
-);
-        }
+public void insertLateReason(String empId, String lateReasonCd, String registerContentCd, String lineId, String detail){
+
+    long lateReasonId = getLateReasonId();
+
+    String sql = """
+        INSERT INTO late_reason(
+            LATE_REASON_ID,
+            EMP_ID,
+            LATE_REASON_CD,
+            REGISTER_CONTENT_CD,
+            LINE_ID,
+            DETAIL,
+            UPDATE_DATE,
+            REGISTER_DATE
+        )
+        VALUES(?, ?, ?, ?, ?, ?, NOW(), NOW())
+        """;
+
+    jdbcTemplate.update(
+        sql,
+        lateReasonId,       // 1
+        empId,              // 2
+        lateReasonCd,       // 3
+        registerContentCd,  // 4
+        lineId,             // 5
+        detail              // 6
+    );
+}
     
     // レコード更新処理
     public void updateLateReason(String lateReasonCd, String registerContentCd, String lineId, String detail){
