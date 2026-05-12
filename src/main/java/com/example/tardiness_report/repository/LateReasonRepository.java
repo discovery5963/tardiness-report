@@ -49,6 +49,7 @@ public class LateReasonRepository {
     public List<ReportDataDto> getLateReason(String empId){
     String sql = """
             SELECT
+                T1.late_reason_id,
                 T1.late_reason_cd,
                 T1.register_content_cd,
                 T1.line_id,
@@ -63,6 +64,7 @@ public class LateReasonRepository {
         List<ReportDataDto> result = new ArrayList<>();
         for (Map<String, Object> row : rows) {
             ReportDataDto dto = ReportDataDto.builder()
+                .lateReasonId(String.valueOf(row.get("late_reason_id")))
                 .empId((String) row.get("late_reason_cd"))
                 .resisterContentCd((String) row.get("register_content_cd"))
                 .lineId((String) row.get("line_id"))
@@ -88,7 +90,7 @@ public void insertLateReason(String empId, String lateReasonCd, String registerC
     String sql = """
         INSERT INTO late_reason(
             LATE_REASON_ID,
-            EMP_ID,
+            EMP_ID,late_reason_id
             LATE_REASON_CD,
             REGISTER_CONTENT_CD,
             LINE_ID,

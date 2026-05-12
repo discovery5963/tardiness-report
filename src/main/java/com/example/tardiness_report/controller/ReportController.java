@@ -79,6 +79,7 @@ public class ReportController {
         } else {
             errFlg = reportService.getTardinessRecord(model);
             if(!Objects.isNull(model.getAttribute("detail"))){
+            session.setAttribute("lateReasonId", model.getAttribute("lateReasonId"));
             model.addAttribute("inputDetail", model.getAttribute("detail"));
             model.addAttribute("line", model.getAttribute("lineId"));
             String lineName = lineList.stream()
@@ -166,8 +167,10 @@ public class ReportController {
         model.addAttribute("inputDetail", inputDetail);
         model.addAttribute("typeFlg", 2);
         String lateReasonCd = format;
-
         String lateReasonId = null;
+        if(!Objects.isNull(session.getAttribute("lateReasonId"))){
+            lateReasonId = (String)session.getAttribute("lateReasonId");
+        }
 
         System.out.println(lateReasonCd);
         if(session.getAttribute("resistFlg").equals(1)){

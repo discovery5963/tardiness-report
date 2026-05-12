@@ -36,6 +36,8 @@ public class ReportService {
             lateReasonData = fetchLateReason(model);
             // 取得結果をmodelにadd
             // 遅刻理由ID
+            model.addAttribute("lateReasonId", lateReasonData.get(0).getLateReasonId());
+            // 遅刻理由コード
             model.addAttribute("lateReasonCd", lateReasonData.get(0).getLateReasonCd());
             // 状態理由コード
             model.addAttribute("resisterContentCd", lateReasonData.get(0).getResisterContentCd());
@@ -96,8 +98,9 @@ public class ReportService {
     public void fetchUpdatelateReasonId(Model model) {
         lateReasonRepository.updateLateReason(
             (String)model.getAttribute("format"),
-            "1",
+            "2",
             (String)model.getAttribute("line"),
-            (String)model.getAttribute("inputDetail"));
+            (String)model.getAttribute("inputDetail"),
+            (String)model.getAttribute("lateReasonId"));
     }
 }
