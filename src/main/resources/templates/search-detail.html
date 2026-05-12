@@ -11,57 +11,10 @@
 <html lang="ja">
     <head>
         <meta charset="UTF-8">
-        <link rel="stylesheet" href="css/search-detail.css">
-        <title>検索・参照</title>
+        <link rel="stylesheet" th:href="@{css/search-detail.css}">
+        <link rel="stylesheet" th:href="@{css/common.css}">
         <link rel="stylesheet" th:href="@{/css/header.css}">
-        <style>
-          body {
-            font-family: sans-serif;
-            margin: 20px;
-          }
-          fieldset {
-            border: 2px solid #666;
-            padding: 15px;
-            margin-bottom: 20px;
-          }
-          legend {
-            font-weight: bold;
-            padding: 0 10px;
-          }
-          .search-row {
-            display: flex;
-            gap: 30px;
-            align-items: flex-start;
-            flex-wrap: wrap;
-          }
-          .form-group {
-            display: flex;
-            flex-direction: column;
-          }
-          label {
-            margin-bottom: 5px;
-            font-weight: bold;
-          }
-          .inline-inputs {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-          }
-          table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-          }
-          th, td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: left;
-          }
-          .buttons {
-            margin-top: 10px;
-          }
-        </style>
-
+        <title>検索・参照</title>
         <!-- 路線・社員名選択用 -->
         <script>
             $(document).ready(function() {
