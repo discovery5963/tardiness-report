@@ -167,13 +167,15 @@ public class ReportController {
         model.addAttribute("typeFlg", 2);
         String lateReasonCd = format;
 
+        String lateReasonId = null;
+
         System.out.println(lateReasonCd);
         if(session.getAttribute("resistFlg").equals(1)){
             // INSERT処理
             lateReasonRepository.insertLateReason(empId,lateReasonCd,format,lineId,inputDetail);
         } else {
             // UPDATE処理
-            lateReasonRepository.updateLateReason(lateReasonCd,format,lineId,inputDetail);
+            lateReasonRepository.updateLateReason(lateReasonCd,format,lineId,inputDetail,lateReasonId);
         }
 
         return "report";
