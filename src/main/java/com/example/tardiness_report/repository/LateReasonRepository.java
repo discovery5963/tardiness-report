@@ -45,7 +45,7 @@ public class LateReasonRepository {
         return result;
     }
 
-    // 遅刻理由IDをキーとしたレコード取得処理
+    // 社員IDをキーとしたレコード取得処理
     public List<ReportDataDto> getLateReason(String empId){
     String sql = """
             SELECT
@@ -54,13 +54,12 @@ public class LateReasonRepository {
                 T1.line_id,
                 T1.detail
             FROM late_reason T1
-            WHERE T1.rmp_id = ?
+            WHERE T1.emp_id = ?
             AND T1.register_date >= CURRENT_DATE
             """;
 
-        long id = Long.parseLong(empId);
 
-        List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, id);
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, empId);
         List<ReportDataDto> result = new ArrayList<>();
         for (Map<String, Object> row : rows) {
             ReportDataDto dto = ReportDataDto.builder()
@@ -112,7 +111,7 @@ public void insertLateReason(String empId, String lateReasonCd, String registerC
 }
     
     // レコード更新処理
-    public void updateLateReason(String lateReasonCd, String registerContentCd, String lineId, String detail){
+    public void updateLateReason(String lateReasonCd, String registerContentCd, String lineId, String detail, String lateReasonId){
     String sql = """
             UPDATE LATE_REASON T1
             SET T1.LATE_REASON_CD = ?,
@@ -122,6 +121,6 @@ public void insertLateReason(String empId, String lateReasonCd, String registerC
             	T1.UPDATE_DATE = to_char(NOW(), 'YYYY-MM-DD HH24:MI:SS')
             WHERE LATE_REASON_ID = ?
             """;
-            jdbcTemplate.queryForList(sql, lateReasonCd, registerContentCd, lineId, detail);
+            jdbcTemplate.queryForList(sql, lateReasonCd, registerContentCd, lineId, detail, lateReasonId);
     }
 }

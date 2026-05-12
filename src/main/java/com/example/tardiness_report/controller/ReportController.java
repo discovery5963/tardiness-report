@@ -48,6 +48,7 @@ public class ReportController {
         List<LineMstDto> lineList = lineMstRepository.getAllLineMstData();
         model.addAttribute("lineList", lineList); // "lineList"としてhtmlに連携する。
         model.addAttribute("lineId", 0000000001);
+        
         // 社員IDをmodelにセット
         model.addAttribute("empId", session.getAttribute("empId"));
         System.out.println("log1");
@@ -56,10 +57,13 @@ public class ReportController {
         // 内容初期化
         if(strInputDetail == null){
             model.addAttribute("inputDetail", INPUT_DETAIL);
-            } else {
+        } else {
             model.addAttribute("inputDetail", session.getAttribute("inputDetail"));
             model.addAttribute("line", session.getAttribute("line"));
             model.addAttribute("format", session.getAttribute("format"));
+            model.addAttribute("typeFlg", 2);
+            model.addAttribute("formatFlg", 1);
+            model.addAttribute("resistFlg", 1);
             return "report";
         }
         
@@ -77,6 +81,13 @@ public class ReportController {
             if(!Objects.isNull(model.getAttribute("detail"))){
             model.addAttribute("inputDetail", model.getAttribute("detail"));
             model.addAttribute("line", model.getAttribute("lineId"));
+            String lineName = lineList.stream()
+            .filter(item -> item.getLineId().equals(model.getAttribute("lineId")))
+            .map(LineMstDto::getLineName)
+            .findFirst()
+            .orElse(null);
+            model.addAttribute("lineName", lineName);
+            session.setAttribute("format", model.getAttribute("late_reason_cd"));
             System.out.println("log3");
             }
         }
