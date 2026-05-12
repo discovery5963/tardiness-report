@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -205,16 +207,28 @@ public class SearchDetailController {
      * @return 検索・参照画面(初期表示)
      */
     @PostMapping(value = "/search", params = "csvOutput")
-    public String csvOutput(@ModelAttribute SearchDetailForm form, Model model) {
-        // TODO
-        // CSVへ出力するデータを取得する
-        // HttpServletResponse response;
+    public void csvOutput(@ModelAttribute SearchDetailForm form, Model model, HttpServletResponse response) {
+        // CSV出力
+        List<SearchDetailDto> searchResultList = searchDetailRepository.getCsvOutput(form);
 
-        // List<SearchDetailDto> resultList = searchDetailRepository.getCsvOutputList(form,
-        // response);
+        try {
+        response.setContentType("text/csv; charset=UTF-8");
+        response.setHeader("Content-Disposition", "attachment; filename=report.csv");
 
+        PrintWriter writer = response.getWriter();
 
-        return "search-detail"; // 結果を同じ画面に表示
+            // ヘッダー行
+            writer.println("日付,社員名,理由,路線,内容");
+
+            // データ行
+            for (SearchDetailDto dto : searchResultList) {
+              writer.println(dto.getRegisterDate() + "," + dto.getEmpLname() + " " + dto.getEmpFname() + "," + dto.getDetail() + ",");
+            }
+
+            writer.flush();
+        } catch (IOException e) {
+            throw new RuntimeException("CSV 出力中にエラーが発生しました", e);
+        }
     }
 
     // /**
