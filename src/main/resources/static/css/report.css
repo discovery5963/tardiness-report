@@ -2,11 +2,6 @@ h1{
     text-align: center;
 }
 
-p{
-    margin-top: 24px;
-    margin-bottom: 5px;
-}
-
 .containerWrapper{
     display: flex;
     width: 100%;
