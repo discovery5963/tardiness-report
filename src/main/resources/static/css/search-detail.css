@@ -18,13 +18,14 @@ th{
   margin-top: 10px;
 }
 
+td {
+    text-align: center;
+    vertical-align: middle;
+    height: 30px;
+    border: solid 1px #b8b8b8;
+}
+
 .page_link td{
-  text-align: center;
-  vertical-align: middle;
-  height: 2px;
-  border: solid 1px #b8b8b8;
-  padding: 8px;
-  text-align: left;
   border-style: none;
   /* width: 50px; */
   /* width: 1%; */
