@@ -65,7 +65,7 @@ public class LateReasonRepository {
         for (Map<String, Object> row : rows) {
             ReportDataDto dto = ReportDataDto.builder()
                 .lateReasonId(String.valueOf(row.get("late_reason_id")))
-                .empId((String) row.get("late_reason_cd"))
+                .lateReasonCd((String) row.get("late_reason_cd"))
                 .resisterContentCd((String) row.get("register_content_cd"))
                 .lineId((String) row.get("line_id"))
                 .detail((String) row.get("detail"))
@@ -90,7 +90,7 @@ public void insertLateReason(String empId, String lateReasonCd, String registerC
     String sql = """
         INSERT INTO late_reason(
             LATE_REASON_ID,
-            EMP_ID,late_reason_id
+            EMP_ID,
             LATE_REASON_CD,
             REGISTER_CONTENT_CD,
             LINE_ID,
@@ -115,14 +115,14 @@ public void insertLateReason(String empId, String lateReasonCd, String registerC
     // レコード更新処理
     public void updateLateReason(String lateReasonCd, String registerContentCd, String lineId, String detail, String lateReasonId){
     String sql = """
-            UPDATE LATE_REASON T1
-            SET T1.LATE_REASON_CD = ?,
-            	T1.REGISTER_CONTENT_CD = ?.
-            	T1.LINE_ID = ?,
-            	T1.DETAIL = ?,
-            	T1.UPDATE_DATE = to_char(NOW(), 'YYYY-MM-DD HH24:MI:SS')
+            UPDATE LATE_REASON
+            SET LATE_REASON_CD = ?,
+            	REGISTER_CONTENT_CD = ?,
+            	LINE_ID = ?,
+            	DETAIL = ?,
+            	UPDATE_DATE = NOW()
             WHERE LATE_REASON_ID = ?
             """;
-            jdbcTemplate.queryForList(sql, lateReasonCd, registerContentCd, lineId, detail, lateReasonId);
+            jdbcTemplate.update(sql, lateReasonCd, registerContentCd, lineId, detail, Long.parseLong(lateReasonId));
     }
 }

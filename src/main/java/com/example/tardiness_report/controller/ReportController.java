@@ -151,6 +151,7 @@ public class ReportController {
         final String CODE ="遅刻理由コードは：";
         final String LINE ="路線IDは：";
         final String DETAIL ="内容は：";
+        boolean errFlg = true;
         System.out.println("======logStart======");
         System.out.println(ID + empId);
         System.out.println(CODE + format);
@@ -168,38 +169,73 @@ public class ReportController {
         model.addAttribute("typeFlg", 2);
         String lateReasonCd = format;
         String lateReasonId = null;
-        if(!Objects.isNull(session.getAttribute("lateReasonId"))){
+        List<LineMstDto> lineList = lineMstRepository.getAllLineMstData();
+        model.addAttribute("lineList", lineList);
+        errFlg = reportService.getTardinessRecord(model);
+        if(!Objects.isNull(model.getAttribute("detail"))){
+            session.setAttribute("lateReasonId", model.getAttribute("lateReasonId"));
             lateReasonId = (String)session.getAttribute("lateReasonId");
+            session.setAttribute("resistFlg", 2);
         }
 
         System.out.println(lateReasonCd);
         if(session.getAttribute("resistFlg").equals(1)){
             // INSERT処理
             lateReasonRepository.insertLateReason(empId,lateReasonCd,format,lineId,inputDetail);
-        } else {
+        } else if(session.getAttribute("resistFlg").equals(2)) {
             // UPDATE処理
             lateReasonRepository.updateLateReason(lateReasonCd,format,lineId,inputDetail,lateReasonId);
         }
-
+        if(model.getAttribute("format").equals("2")){
+            lineId = null;
+        }
+        lineName = lineList.stream()
+        .filter(item -> item.getLineId().equals(model.getAttribute("lineId")))
+        .map(LineMstDto::getLineName)
+        .findFirst()
+        .orElse(null);
+        model.addAttribute("lineName", lineName);
         return "report";
     }
     // 修正
     @PostMapping("/modify")
     public String modifyReport(HttpSession session,
         Model model){
-        String format = (String)session.getAttribute("format");
-        if("train".equals(format)){
+        String format = "";
+        // 路線名の取得
+        List<LineMstDto> lineList = lineMstRepository.getAllLineMstData();
+        model.addAttribute("lineList", lineList);
+        String lineName = "";
+        lineName = lineList.stream()
+        .filter(item -> item.getLineId().equals(model.getAttribute("lineId")))
+        .map(LineMstDto::getLineName)
+        .findFirst()
+        .orElse(null);
+        model.addAttribute("lineName", lineName);
+        boolean errFlg = true;
+        String lateReasonId = null;
+        errFlg = reportService.getTardinessRecord(model);
+        if(!Objects.isNull(model.getAttribute("detail"))){
+            session.setAttribute("lateReasonId", model.getAttribute("lateReasonId"));
+            lateReasonId = (String)session.getAttribute("lateReasonId");
+            model.addAttribute("inputDetail", model.getAttribute("detail"));
+            lineName = lineList.stream()
+            .filter(item -> item.getLineId().equals(model.getAttribute("lineId")))
+            .map(LineMstDto::getLineName)
+            .findFirst()
+            .orElse(null);
+            model.addAttribute("lineName", lineName);
+            session.setAttribute("resistFlg", 2);
+            session.setAttribute("format",model.getAttribute("lateReasonCd"));
+        }    
+        format = (String)session.getAttribute("format");
+        if("1".equals(format)){
             format = "1";
-        } else if ("free".equals(format)){
+        } else if ("2".equals(format)){
             format = "2";
         } 
         model.addAttribute("formatFlg", format);
-        model.addAttribute("lineId", session.getAttribute("lineId"));
-        model.addAttribute("inputDetail", session.getAttribute("inputDetail"));
         model.addAttribute("typeFlg", 1);
-        // 路線名の取得
-        List<LineMstDto> lineList = lineMstRepository.getAllLineMstData();
-        model.addAttribute("lineList", lineList); // "lineList"としてhtmlに連携する。
         return "report";
     }
 }

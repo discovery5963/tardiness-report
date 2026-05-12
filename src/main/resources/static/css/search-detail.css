@@ -1,18 +1,30 @@
-table {
-    border-collapse: collapse;
-    margin: auto;
+th{
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+
+.page_link {
+  border-collapse: collapse;
+  margin: auto;
+  width: 100%;
+  margin-top: 10px;
+  height: 5px; 
+}
+.search_results{
+  border-collapse: collapse;
+  margin: auto;
+  width: 100%;
+  margin-top: 10px;
 }
 
 td {
-    text-align: center;
-    vertical-align: middle;
-    height: 30px;
-    border: solid 1px #b8b8b8;
+  text-align: center;
+  vertical-align: middle;
+  height: 30px;
+  border: solid 1px #b8b8b8;
 }
 
-table.page_link {
-  height: 5px; 
-}
 .page_link td{
   border-style: none;
   /* width: 50px; */
@@ -25,17 +37,52 @@ table.page_link {
     text-align: right;
 }
 
-  .left-align {
-    text-align: left;
-  }
-  .center-align {
-    text-align: center;
-  }
-  .right-align {
-    text-align: right;
-  }
+.left-align {
+  text-align: left;
+}
 
+.center-align {
+  text-align: center;
+}
 
+.right-align {
+  text-align: right;
+}
 
+.buttons {
+  margin-top: 10px;
+}
 
+.inline-inputs {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
 
+label {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.search-row {
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+legend {
+  font-weight: bold;
+  padding: 0 10px;
+}
+
+fieldset {
+  border: 2px solid #666;
+  padding: 15px;
+  margin-bottom: 20px;
+}
