@@ -65,7 +65,7 @@ public class SearchDetailRepository {
                 // 既に指定された条件がない場合
                 sql = sql + " WHERE LINE_ID = '" + lineId +"'";    
             } else {
-                //既に指定された条件がある場合
+                // 既に指定された条件がある場合
                 sql = sql + " AND LINE_ID = '" + lineId +"'";
             }
             count = count + 1;
@@ -76,12 +76,6 @@ public class SearchDetailRepository {
             // SQLに条件を追加
             sql = sql + "AND REGISTER_DATE BETWEEN '" + startDate +"' AND '" + endDate +"'" ;
         }
-
-        // return jdbcTemplate.queryForObject(
-        //         sql,
-        //         new Object[] {empID, lineId, startDate, endDate},
-        //         new int[] {Types.VARCHAR, Types.VARCHAR, Types.DATE, Types.DATE},
-        //         Integer.class);
 
         int allCount = jdbcTemplate.queryForObject(sql, int.class);
 
@@ -115,27 +109,21 @@ public class SearchDetailRepository {
         // SQLクエリの作成
         String sql ="""
                         SELECT
-                            EMP.EMP_LNAME,
-                            EMP.EMP_FNAME,
-                            LR.REGISTER_DATE,
-                            LR.LATE_REASON_CD,
-                            LR.DETAIL,
-                            LM.LINE_NAME
+                            EMP_NAME,
+                            REGISTER_DATE,
+                            LATE_REASON_CD,
+                            DETAIL,
+                            LINE_NAME
                         FROM
-                            LATE_REASON LR
-                            INNER JOIN EMPLOYEE_MST EMP
-                                ON LR.EMP_ID = EMP.EMP_ID
-                            INNER JOIN LINE_MST LM
-                                ON LR.LINE_ID = LM.LINE_ID
+                            SEARCH_LIST_VIEW
                         WHERE
-                            LR.EMP_ID = ?
-                            AND LR.LINE_ID = ?
-                            AND LR.REGISTER_DATE BETWEEN ? AND ?
+                            EMP_ID = ?
+                            AND LINE_ID = ?
+                            AND REGISTER_DATE BETWEEN ? AND ?
                         ORDER BY
                             REGISTER_DATE
                         LIMIT %d OFFSET %d
                         """.formatted(limitCount, offsetValue);
-                        //empID, "0000000060", startDate, endDate, limitCount, offsetValue);
 
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, empID, lineId, startDateLD, endDateLD);
         List<SearchDetailDto> result = new ArrayList<>();
@@ -143,8 +131,7 @@ public class SearchDetailRepository {
         for (Map<String, Object> row : rows) {
             SearchDetailDto dto =
                     SearchDetailDto.builder()
-                            .empLname((String) row.get("EMP_LNAME"))
-                            .empFname((String) row.get("EMP_FNAME"))
+                            .empName((String) row.get("EMP_NAME"))
                             .registerDate((Timestamp) row.get("REGISTER_DATE"))
                             .lateReasonCd((String) row.get("LATE_REASON_CD"))
                             .detail((String) row.get("DETAIL"))

@@ -107,9 +107,6 @@ public class SearchDetailController {
     	 // 初期ページ番号を設定
         form.setCurrentPageNumber(1);
 
-        // 検索処理結果を格納したリスト
-        // List<SearchDetailForm> results = searchDetailService.findListOld(form);
-
         String empID = "";
         if (session.getAttribute("role").equals("1")) {
             // 一般社員の場合、検索条件の従業員IDに自分の従業員IDをセット
@@ -124,6 +121,7 @@ public class SearchDetailController {
                 searchDetailRepository.getAllListCount(
                         String.valueOf(model.getAttribute("role")), empID, form.getLineId(),
                         form.getStartDate(), form.getEndDate());
+
         // 表示用にページングされたリストを取得
         List<SearchDetailDto> resultList =
                 searchDetailRepository.getResultList(

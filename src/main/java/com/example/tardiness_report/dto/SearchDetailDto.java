@@ -22,6 +22,9 @@ public class SearchDetailDto {
     /** 社員名 */
     private String empFname;
 
+    /** 社姓姓名 */
+    private String empName;
+
     /** 遅刻理由コード */
     private String lateReasonCd;
 
