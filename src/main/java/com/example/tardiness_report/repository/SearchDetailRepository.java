@@ -33,49 +33,27 @@ public class SearchDetailRepository {
      *
      * @param role ログインユーザーの役職
      * @param empID 検索対象の従業員ID
+     * @param teamId 検索対象のチームID
      * @param lineId 検索対象の路線ID
      * @param startDate 検索対象の開始日付（登録日）
      * @param endDate 検索対象の終了日付（登録日）
      * @return 検索結果の総件数
      * @throws org.springframework.dao.DataAccessException JDBC 操作に失敗した場合にスローされる
      */
-    public int getAllListCount(
-            String role, String empID, String lineId, String startDate, String endDate) {
+    public int getAllListCount(String role, String empID, String teamId, String lineId,
+            String startDate, String endDate) {
         // 検索SQL（全件検索状態）
-        String sql =
-                """
+        String sql = """
                 SELECT
                     COUNT(*) AS total_count
                 FROM
                     SEARCH_LIST_VIEW
+                WHERE
+                    1 = 1
                 """;
-        
-        // SQL条件数カウント
-        int count = 0;
 
-        // 従業員IDが入力されている場合
-        if ((empID != null && !empID.isEmpty())) {
-            sql = sql + " WHERE EMP_ID = '" + empID + "'";
-            count = count + 1;
-        }
 
-        // 路線IDが入力されている場合
-        if (lineId != null && !lineId.isEmpty()) {
-            if (count == 0) {
-                // 既に指定された条件がない場合
-                sql = sql + " WHERE LINE_ID = '" + lineId +"'";    
-            } else {
-                // 既に指定された条件がある場合
-                sql = sql + " AND LINE_ID = '" + lineId +"'";
-            }
-            count = count + 1;
-        }
-
-        // 開始日付、終了日付に値がある場合
-        if ((startDate != null && !startDate.isEmpty()) && (endDate != null && !endDate.isEmpty())) {
-            // SQLに条件を追加
-            sql = sql + "AND REGISTER_DATE BETWEEN '" + startDate +"' AND '" + endDate +"'" ;
-        }
+        sql = setCriteria(sql, role, empID, teamId, lineId, startDate, endDate);
 
         int allCount = jdbcTemplate.queryForObject(sql, int.class);
 
@@ -85,58 +63,64 @@ public class SearchDetailRepository {
     /**
      * 指定した従業員IDに紐づく遅刻理由の一覧をページングして取得する。
      *
+     * @param role ログインユーザーの役職
      * @param empID 検索対象の従業員ID（null不可）
+     * @param teamId 検索対象のチームID
+     * @param startDate 検索対象の開始日付（登録日）。nullまたは空文字の場合は条件に含めない
+     * @param endDate 検索対象の終了日付（登録日）。nullまたは空文字の場合は条件に含めない
+     * @param lineId 検索対象の路線ID。nullまたは
      * @param limitCount 取得する最大件数（ページサイズ）
      * @param currentPageNumber 現在のページ番号（1から開始）
      * @return SearchDetailDto のリスト。該当なしの場合は空リストを返す。
      * @throws org.springframework.dao.DataAccessException JDBC 操作に失敗した場合にスローされる
      */
-    public List<SearchDetailDto> getResultList(
-            String empID,
-            String startDate,
-            String endDate,
-            String lineId,
-            int limitCount,
+    public List<SearchDetailDto> getResultList(String role, String empID, String teamId,
+            String startDate, String endDate, String lineId, int limitCount,
             int currentPageNumber) {
 
-        // 開始日付、終了日付をLocalDate型に変換
-        LocalDate startDateLD = LocalDate.parse(startDate);
-        LocalDate endDateLD = LocalDate.parse(endDate);
+        LocalDate startDateLD = null;
+        LocalDate endDateLD = null;
+
+        // 値が設定されている場合は開始日付、終了日付をLocalDate型に変換
+        if (startDate != null && !startDate.isEmpty()) {
+            startDateLD = LocalDate.parse(startDate);
+        }
+        if (endDate != null && !endDate.isEmpty()) {
+            endDateLD = LocalDate.parse(endDate);
+        }
 
         // オフセットの計算
         int offsetValue = (currentPageNumber - 1) * limitCount;
 
         // SQLクエリの作成
-        String sql ="""
-                        SELECT
-                            EMP_NAME,
-                            REGISTER_DATE,
-                            LATE_REASON_CD,
-                            DETAIL,
-                            LINE_NAME
-                        FROM
-                            SEARCH_LIST_VIEW
-                        WHERE
-                            EMP_ID = ?
-                            AND LINE_ID = ?
-                            AND REGISTER_DATE BETWEEN ? AND ?
-                        ORDER BY
-                            REGISTER_DATE
-                        LIMIT %d OFFSET %d
-                        """.formatted(limitCount, offsetValue);
+        String sql = """
+                SELECT
+                    EMP_NAME,
+                    REGISTER_DATE,
+                    LATE_REASON_CD,
+                    DETAIL,
+                    LINE_NAME
+                FROM
+                    SEARCH_LIST_VIEW
+                WHERE
+                    1 = 1
+                """;
 
-        List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, empID, lineId, startDateLD, endDateLD);
+        // SQLクエリに条件を追加
+        sql = setCriteria(sql, role, empID, teamId, lineId, startDate, endDate);
+
+        sql += " ORDER BY REGISTER_DATE ";
+        sql += " LIMIT %d OFFSET %d".formatted(limitCount, offsetValue);
+
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
         List<SearchDetailDto> result = new ArrayList<>();
 
         for (Map<String, Object> row : rows) {
-            SearchDetailDto dto =
-                    SearchDetailDto.builder()
-                            .empName((String) row.get("EMP_NAME"))
-                            .registerDate((Timestamp) row.get("REGISTER_DATE"))
-                            .lateReasonCd((String) row.get("LATE_REASON_CD"))
-                            .detail((String) row.get("DETAIL"))
-                            .lineName((String) row.get("LINE_NAME"))
-                            .build();
+            SearchDetailDto dto = SearchDetailDto.builder().empName((String) row.get("EMP_NAME"))
+                    .registerDate((Timestamp) row.get("REGISTER_DATE"))
+                    .lateReasonCd((String) row.get("LATE_REASON_CD"))
+                    .detail((String) row.get("DETAIL")).lineName((String) row.get("LINE_NAME"))
+                    .build();
 
             result.add(dto);
         }
@@ -151,45 +135,40 @@ public class SearchDetailRepository {
      * @return SearchDetailDto のリスト。該当なしの場合は空リストを返す。
      * @throws org.springframework.dao.DataAccessException JDBC 操作に失敗した場合にスローされる
      */
-    public List<SearchDetailDto> getCsvOutputList
-        (SearchDetailForm form, HttpServletResponse response) throws IOException {
+    public List<SearchDetailDto> getCsvOutputList(SearchDetailForm form,
+            HttpServletResponse response) throws IOException {
 
         // SQLクエリの作成
-        String sql = String.format(
-                        """
-                        SELECT
-                            EMP.EMP_LNAME,
-                            EMP.EMP_FNAME,
-                            LR.REGISTER_DATE,
-                            LR.LATE_REASON_CD,
-                            LR.DETAIL,
-                            LM.LINE_NAME
-                        FROM
-                            LATE_REASON LR
-                            INNER JOIN EMPLOYEE_MST EMP
-                                ON LR.EMP_ID = EMP.EMP_ID
-                            INNER JOIN LINE_MST LM
-                                ON LR.LINE_ID = LM.LINE_ID
-                        WHERE
-                            LR.EMP_ID = '%s'
-                        ORDER BY
-                            REGISTER_DATE
-                        """,
-                        form.getEmpId());
-        
+        String sql = String.format("""
+                SELECT
+                    EMP.EMP_LNAME,
+                    EMP.EMP_FNAME,
+                    LR.REGISTER_DATE,
+                    LR.LATE_REASON_CD,
+                    LR.DETAIL,
+                    LM.LINE_NAME
+                FROM
+                    LATE_REASON LR
+                    INNER JOIN EMPLOYEE_MST EMP
+                        ON LR.EMP_ID = EMP.EMP_ID
+                    INNER JOIN LINE_MST LM
+                        ON LR.LINE_ID = LM.LINE_ID
+                WHERE
+                    LR.EMP_ID = '%s'
+                ORDER BY
+                    REGISTER_DATE
+                """, form.getEmpId());
+
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
         List<SearchDetailDto> result = new ArrayList<>();
 
         for (Map<String, Object> row : rows) {
-            SearchDetailDto dto =
-                    SearchDetailDto.builder()
-                            .empLname((String) row.get("EMP_LNAME"))
-                            .empFname((String) row.get("EMP_FNAME"))
-                            .registerDate((Timestamp) row.get("REGISTER_DATE"))
-                            .lateReasonCd((String) row.get("LATE_REASON_CD"))
-                            .detail((String) row.get("DETAIL"))
-                            .lineName((String) row.get("LINE_NAME"))
-                            .build();
+            SearchDetailDto dto = SearchDetailDto.builder().empLname((String) row.get("EMP_LNAME"))
+                    .empFname((String) row.get("EMP_FNAME"))
+                    .registerDate((Timestamp) row.get("REGISTER_DATE"))
+                    .lateReasonCd((String) row.get("LATE_REASON_CD"))
+                    .detail((String) row.get("DETAIL")).lineName((String) row.get("LINE_NAME"))
+                    .build();
             result.add(dto);
         }
 
@@ -204,11 +183,60 @@ public class SearchDetailRepository {
         // データ行
         for (SearchDetailDto dto : result) {
             // TODO 文字列結合をStringBuilderに置き換える。以下の出力項目の内容はまだ修正途中。
-            writer.println(dto.getRegisterDate() + "," + dto.getEmpLname() + " " + dto.getEmpFname() + "," + dto.getDetail() + ",");
+            writer.println(dto.getRegisterDate() + "," + dto.getEmpLname() + " " + dto.getEmpFname()
+                    + "," + dto.getDetail() + ",");
         }
 
         writer.flush();
 
         return result;
     }
+
+    /**
+     * 指定した検索条件を基にSQLクエリに条件を追加する。
+     *
+     * @param sql 基底SQLクエリ
+     * @param role ログインユーザーの役職
+     * @param empID 検索対象の従業員ID
+     * @param teamId 検索対象のチームID
+     * @param lineId 検索対象の路線ID
+     * @param startDate 検索対象の開始日付（登録日）
+     * @param endDate 検索対象の終了日付（登録日）
+     * @return 条件を追加したSQLクエリ
+     */
+    public String setCriteria(String sql, String role, String empID, String teamId, String lineId,
+            String startDate, String endDate) {
+
+
+        // 従業員IDが入力されている場合
+        if ((empID != null && !empID.isEmpty())) {
+            sql = sql + " AND EMP_ID = '" + empID + "'";
+        }
+
+        // 路線IDが入力されている場合
+        if (lineId != null && !lineId.isEmpty()) {
+            sql = sql + " AND LINE_ID = '" + lineId + "'";
+        }
+
+        // 開始日付、終了日付に値がある場合
+        if ((startDate != null && !startDate.isEmpty())
+                && (endDate != null && !endDate.isEmpty())) {
+            // SQLに条件を追加
+            sql = sql + "AND REGISTER_DATE BETWEEN '" + startDate + "' AND '" + endDate + "'";
+        }
+
+        // ｢遅刻理由｣検索処理(管理職付きの場合)
+        // 'セッション.社員ID'に紐づく、社員マスタ.役職=2,3,4の場合(C以上MGR以下)
+        if (role.equals("2") || role.equals("3") || role.equals("4")) {
+            sql = sql + " AND TEAM_ID = '" + teamId + "'";
+        }
+
+        // 'セッション.社員ID'に紐づく、社員マスタ.役職=5(MGR)の場合
+        if (role.equals("5")) {
+            sql = sql + " AND (TEAM_ID = '" + teamId + "' OR ROLE != '1')";
+        }
+        return sql;
+    }
+
+
 }

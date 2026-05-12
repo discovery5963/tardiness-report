@@ -44,14 +44,10 @@ public class EmployeeMstRepository {
 
         for (Map<String, Object> row : rows) {
             UserDataDto dto = UserDataDto.builder().empId((String) row.get("emp_id"))
-                    .empLname((String) row.get("emp_lname"))
-                    .empFname((String) row.get("emp_fname"))
-                    .teamId((String) row.get("team_id"))
-                    .password((String) row.get("password"))
-                    .teamName((String) row.get("team_name"))
-                    .unitNo((String) row.get("unit_no"))
-                    .role((String) row.get("role"))
-                    .roleName((String) row.get("role_name")).build();
+                    .empLname((String) row.get("emp_lname")).empFname((String) row.get("emp_fname"))
+                    .teamId((String) row.get("team_id")).password((String) row.get("password"))
+                    .teamName((String) row.get("team_name")).unitNo((String) row.get("unit_no"))
+                    .role((String) row.get("role")).roleName((String) row.get("role_name")).build();
             result.add(dto);
         }
 
@@ -59,7 +55,7 @@ public class EmployeeMstRepository {
     }
 
     // 検索・参照画面用社員情報取得
-    public List<UserDataDto> getEmpDataForSearchDetail(String teamId) {
+    public List<UserDataDto> getEmpDataForSearchDetail(String teamId, String role) {
 
         String sql = """
                 SELECT
@@ -80,7 +76,20 @@ public class EmployeeMstRepository {
                 ON emp.department_id = dep.department_id
                 LEFT JOIN TardinessReport.team_mst team
                 ON emp.team_id = team.team_id
-                WHERE emp.team_id = '""" + teamId + "'";
+                WHERE
+                    1 = 1
+                """;
+
+        // 「社員名称｣検索処理((管理職付きの場合のみ実行する。)
+        // 'セッション.社員ID'に紐づく、社員マスタ.役職=2,3,4の場合(C以上MGR以下)
+        if (role.equals("2") || role.equals("3") || role.equals("4")) {
+            sql = sql + " AND  emp.TEAM_ID = '" + teamId + "'";
+        }
+
+        // 'セッション.社員ID'に紐づく、社員マスタ.役職=5(MGR)の場合
+        if (role.equals("5")) {
+            sql = sql + " AND ( emp.TEAM_ID = '" + teamId + "' OR  emp.ROLE != '1')";
+        }
 
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
         List<UserDataDto> result = new ArrayList<>();
@@ -88,14 +97,11 @@ public class EmployeeMstRepository {
         for (Map<String, Object> row : rows) {
             UserDataDto dto = UserDataDto.builder().empId((String) row.get("emp_id"))
                     .departmentId((String) row.get("department_id"))
-                    .teamId((String) row.get("team_id"))
-                    .empLname((String) row.get("emp_lname"))
-                    .empFname((String) row.get("emp_fname"))
-                    .belong((String) row.get("belong"))
+                    .teamId((String) row.get("team_id")).empLname((String) row.get("emp_lname"))
+                    .empFname((String) row.get("emp_fname")).belong((String) row.get("belong"))
                     .password((String) row.get("password"))
                     .departmentName((String) row.get("department_name"))
-                    .teamName((String) row.get("team_name"))
-                    .role((String) row.get("role")).build();
+                    .teamName((String) row.get("team_name")).role((String) row.get("role")).build();
             result.add(dto);
         }
 

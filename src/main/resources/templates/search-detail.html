@@ -95,7 +95,7 @@
              <div class="form-group">
              <label>路線:</label>
                <select id="line-select" th:field="*{lineId}">
-                   <option value="選択してください。"></option>
+                   <option value=""></option>
                    <option
                        th:each="item : ${lineList}"
                        th:value="${item.lineId}"
@@ -113,7 +113,7 @@
              <div class="form-group">
              <label>社員名称:</label>
                <select id="employee-select" th:field="*{empId}">
-                   <option value="選択してください。"></option>
+                   <option value=""></option>
                    <option
                        th:each="item : ${employeeList}"
                        th:value="${item.empId}"
