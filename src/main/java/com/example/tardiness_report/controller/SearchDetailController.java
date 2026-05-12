@@ -149,23 +149,34 @@ public class SearchDetailController {
      *
      * @param form form入力値
      * @param model モデル
+     * @param session セッション
      * @return 検索・参照画面(初期表示)
      */
     @PostMapping(value = "/search", params = "goPrevious")
-    public String goPreviousPage(@ModelAttribute SearchDetailForm form, Model model) {
+    public String goPreviousPage(@ModelAttribute SearchDetailForm form, Model model,
+            HttpSession session) {
+
+        String empID = "";
+        if (session.getAttribute("role").equals("1")) {
+            // 一般社員の場合、検索条件の従業員IDに自分の従業員IDをセット
+            empID = String.valueOf(session.getAttribute("empId"));
+        } else {
+            // 一般社員以外の場合、検索条件の従業員IDに入力した値をセット
+            empID = form.getEmpId();
+        }
 
         // ページ番号を減算
         form.setCurrentPageNumber(form.getCurrentPageNumber() - 1);
 
         // 表示用にページングされたリストを取得
-        // List<SearchDetailDto> resultList =
-        // searchDetailRepository.getResultList(
-        // form.getEmpId(), form.getStartDate()ITEMS_PER_PAGE,
-        // form.getCurrentPageNumber());
+        List<SearchDetailDto> resultList = searchDetailRepository.getResultList(
+                String.valueOf(session.getAttribute("role")), empID,
+                String.valueOf(session.getAttribute("teamId")), form.getStartDate(),
+                form.getEndDate(), form.getLineId(), ITEMS_PER_PAGE, form.getCurrentPageNumber());
 
         model.addAttribute("startDate", form);
         model.addAttribute("searchDetailForm", form);
-        // model.addAttribute("resultList", resultList);
+        model.addAttribute("resultList", resultList);
         model.addAttribute("isInitial", false); // 初期表示フラグ
         model.addAttribute("currentPageNumber", form.getCurrentPageNumber()); // 現在のページ番号をモデルに追加
         return "search-detail"; // 結果を同じ画面に表示
@@ -176,22 +187,41 @@ public class SearchDetailController {
      *
      * @param form form入力値
      * @param model モデル
+     * @param session セッション
      * @return 検索・参照画面(初期表示)
      */
     @PostMapping(value = "/search", params = "goNext")
-    public String goNextPage(@ModelAttribute SearchDetailForm form, Model model) {
+    public String goNextPage(@ModelAttribute SearchDetailForm form, Model model,
+            HttpSession session) {
+
+        String empID = "";
+        if (session.getAttribute("role").equals("1")) {
+            // 一般社員の場合、検索条件の従業員IDに自分の従業員IDをセット
+            empID = String.valueOf(session.getAttribute("empId"));
+        } else {
+            // 一般社員以外の場合、検索条件の従業員IDに入力した値をセット
+            empID = form.getEmpId();
+        }
 
         // ページ番号を増算
         form.setCurrentPageNumber(form.getCurrentPageNumber() + 1);
 
+        // 最後のページ判定
+        // TODO: 現在のページ番号と総件数から最後のページかどうかを判定するロジックを実装する必要あり。
+        // TODO：セッションに格納する？
+        // boolean isLastPage = (form.getCurrentPageNumber() + 1)
+        // * ITEMS_PER_PAGE >= (Integer) model.getAttribute("allCount");
+        // <button th:disabled="${isLastPage}">次へ</button>
+
         // 表示用にページングされたリストを取得
-        // List<SearchDetailDto> resultList =
-        // searchDetailRepository.getResultList(
-        // form.getEmpId(), ITEMS_PER_PAGE, form.getCurrentPageNumber());
+        List<SearchDetailDto> resultList = searchDetailRepository.getResultList(
+                String.valueOf(session.getAttribute("role")), empID,
+                String.valueOf(session.getAttribute("teamId")), form.getStartDate(),
+                form.getEndDate(), form.getLineId(), ITEMS_PER_PAGE, form.getCurrentPageNumber());
 
         model.addAttribute("startDate", form);
         model.addAttribute("searchDetailForm", form);
-        // model.addAttribute("resultList", resultList);
+        model.addAttribute("resultList", resultList);
         model.addAttribute("isInitial", false); // 初期表示フラグ
         model.addAttribute("currentPageNumber", form.getCurrentPageNumber()); // 現在のページ番号をモデルに追加
         return "search-detail"; // 結果を同じ画面に表示

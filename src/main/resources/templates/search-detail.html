@@ -147,7 +147,7 @@
             <td>
               <!-- 前へボタン押下時の処理 -->
               <div class="right-align">
-                  <input type="submit" id="previousPage" name="goPrevious" value="◀" class="btn btn-secondary" />
+                  <input type="submit" id="previousPage" name="goPrevious" value="◀" class="btn btn-secondary" th:disabled="${currentPageNumber == 1}"/>
                   <!-- <input type="hidden" id="screen" name="screen" value="検索・参照画面" /> -->
                   <input type="hidden" name="currentPageNumber" th:value="${currentPageNumber}" />
                   <input type="hidden" id="action" name="action" value="prev"/>
