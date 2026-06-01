@@ -13,105 +13,104 @@
     <link rel="stylesheet" href="css/common.css">
     <link rel="stylesheet" href="css/report.css">
     <title>報告画面</title>
-            <!-- 路線・社員名選択用 -->
-        <script>
-            $(document).ready(function() {
-                $('#line-select').select2({
+    <!-- 路線・社員名選択用 -->
+    <script>
+        $(document).ready(function () {
+            $('#line-select').select2({
                 placeholder: '検索ワードを入力'
-                });
             });
-        </script>
+            $('#format').select2();
+        });
+    </script>
+
 </head>
 
 <body>
     <div th:replace="fragments/header :: commonHeader"></div>
     <form action="/resist" method="post">
-    <div id="report" class="hidden">
-        <div>
-            <h1 id="exists" th:text="${existsFlg} ? '初回連絡登録' : '到着連絡登録'">
-            </h1>
+        <div id="report" class="hidden">
+            <div>
+                <h1 id="exists" th:text="${existsFlg} ? '初回連絡登録' : '到着連絡登録'">
+                </h1>
             </div>
-        <!-- フォーマット選択、路線検索、検索ボタン -->
-        <div class="containerWrapper">
-            <div class="format">
-                <p>フォーマット選択</p>
-                <select name="format" id="format">
-                    <option value="train">電車遅延</option>
-                    <option value="free">フリーフォーマット</option>
-                </select>
-            </div>
-            <div class="containerMiddle">
-                <div id="train" class="hidden">
-                    <div>
-                        <p>路線検索</p>
-                    </div>
-                            <select name="lineId" id="line-select">
-                                <option value="">選択してください。</option>
-                                <option 
-                                    th:each="item : ${lineList}"
-                                    th:value="${item.lineId}"
-                                    th:text="${item.lineName}"
-                                    th:attr="data-line-name=${item.lineName}"
-                                    th:selected="${item.lineId == selectedLineId}">
-                                </option>
-                            </select>
-                            <input type="hidden" name="lineName" id="lineName">
-                    <!-- 内容 -->
-                    <div>
-                    </div>
+            <!-- フォーマット選択、路線検索、検索ボタン -->
+            <div class="containerWrapper">
+                <div class="format">
+                    <p>フォーマット選択</p>
+                    <select name="format" id="format">
+                        <option value="train">電車遅延</option>
+                        <option value="free">フリーフォーマット</option>
+                    </select>
                 </div>
-                <div id="free">
-                    <div>
-                        <p>内容</p>
-                        <textarea class="inputDetail" name="inputDetail" th:text="${inputDetail}"></textarea>
-                        <div>※500文字以内で入力してください。</div>
+                <div class="containerMiddle">
+                    <div id="train" class="hidden">
+                        <div>
+                            <p>路線検索</p>
+                        </div>
+                        <select name="lineId" id="line-select">
+                            <option value="">選択してください。</option>
+                            <option th:each="item : ${lineList}" th:value="${item.lineId}" th:text="${item.lineName}"
+                                th:attr="data-line-name=${item.lineName}"
+                                th:selected="${item.lineId == selectedLineId}">
+                            </option>
+                        </select>
+                        <input type="hidden" name="lineName" id="lineName">
+                        <!-- 内容 -->
+                        <div>
+                        </div>
+                    </div>
+                    <div id="free">
+                        <div>
+                            <p>内容</p>
+                            <textarea class="inputDetail" name="inputDetail" th:text="${inputDetail}"></textarea>
+                            <div>※500文字以内で入力してください。</div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
             <button class="botton" type="submit">登録</button>
-    </div>
+        </div>
     </form>
     <form action="/modify" method="post">
-    <div id="confirm" class="hidden">
-        <h1>
-            登録内容表示
-        </h1>
-        <p class="updateMessage" style="color:red">登録完了しました！</p>
-        <div class="confirmDetail">
-            <div>
-                <p>使用路線</p>
-                <div th:text="${lineName}"></div>
+        <div id="confirm" class="hidden">
+            <h1>
+                登録内容表示
+            </h1>
+            <p class="updateMessage" style="color:red">登録完了しました！</p>
+            <div class="confirmDetail">
+                <div>
+                    <p>使用路線</p>
+                    <div th:text="${lineName}"></div>
+                </div>
+                <div>
+                    <p>内容</p>
+                    <textarea readonly class="inputDetail" name="inputDetail" th:text="${inputDetail}"></textarea>
+                </div>
             </div>
-            <div>
-                <p>内容</p>
-                <textarea readonly class="inputDetail" name="inputDetail" th:text="${inputDetail}"></textarea>
+            <div class="botton">
+                <div class="registButton">
+                    <button type="submit">編集</button>
+                </div>
             </div>
         </div>
-        <div class="botton">
-            <div class="registButton">
-                <button type="submit">編集</button>
-            </div>
-        </div>
-    </div>
     </form>
 </body>
 
 <script th:inline="javascript">
     // 登録or確認フラグ
-    const typeFlg = [[${typeFlg}]];
+    const typeFlg = [[${ typeFlg }]];
     // フォーマットフラグ
-    const formatFlg = [[${formatFlg}]];
+    const formatFlg = [[${ formatFlg }]];
     // 存在フラグ
-    const existsFlg = [[${existsFlg}]];
+    const existsFlg = [[${ existsFlg }]];
     const train = document.getElementById("train");
     const free = document.getElementById("free");
     const report = document.getElementById("report");
     const confirm = document.getElementById("confirm");
 
-    document.getElementById("line-select").addEventListener("change", function() {
-    const selected = this.options[this.selectedIndex];
-    document.getElementById("lineName").value = selected.dataset.lineName;
+    document.getElementById("line-select").addEventListener("change", function () {
+        const selected = this.options[this.selectedIndex];
+        document.getElementById("lineName").value = selected.dataset.lineName;
     });
 
     // 登録画面
@@ -122,7 +121,7 @@
         } else {
             free.classList.remove("hidden");
         }
-    // 確認画面
+        // 確認画面
     } else if (typeFlg == 2) {
         confirm.classList.remove("hidden");
         if (formatFlg == 2) {
@@ -133,33 +132,34 @@
     const menu = document.getElementById('format');
     menu.addEventListener('change', (event) => {
         const selectedItem = event.target.value;
-        if(selectedItem == "train"){
+        if (selectedItem == "train") {
             train.classList.remove("hidden");
-        } else if (selectedItem == "free"){
+        } else if (selectedItem == "free") {
             train.classList.add("hidden");
         }
     });
 
-const textarea = document.getElementsByName('inputDetail')[0];
+    const textarea = document.getElementsByName('inputDetail')[0];
 
-menu.addEventListener('change', (event) => {
-    const selectedItem = event.target.value;
+    menu.addEventListener('change', (event) => {
+        const selectedItem = event.target.value;
 
-    if (selectedItem === "train") {
-        train.classList.remove("hidden");
-        textarea.value = "電車遅延時間：分\r\n" + "現場遅刻時間：分";
-    } else if (selectedItem === "free") {
-        train.classList.add("hidden");
-        textarea.value = "遅刻理由：\r\n" + "到着予定時刻：\r\n" + "業務開始時刻：";
-    }
-});
-window.addEventListener('load', () => {
-    if (existsFlg == 1) {
-        title.textContent = "連絡更新";
-    } else {
-        title.textContent = "連絡登録";
-    }
-});
+        if (selectedItem === "train") {
+            train.classList.remove("hidden");
+            textarea.value = "電車遅延時間：分\r\n" + "現場遅刻時間：分";
+        } else if (selectedItem === "free") {
+            train.classList.add("hidden");
+            textarea.value = "遅刻理由：\r\n" + "到着予定時刻：\r\n" + "業務開始時刻：";
+        }
+    });
+    window.addEventListener('load', () => {
+        if (existsFlg == 1) {
+            title.textContent = "連絡更新";
+        } else {
+            title.textContent = "連絡登録";
+        }
+    });
+
 </script>
 
 </html>
