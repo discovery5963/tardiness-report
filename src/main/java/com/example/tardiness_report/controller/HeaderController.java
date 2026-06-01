@@ -37,4 +37,18 @@ public class HeaderController {
         // ログイン画面へ遷移
         return "login";
     }
+
+    /**
+     * タブを閉じた際の処理(ログアウトボタンを押下せずに落とした場合の処理)
+     *
+     * @param session セッション情報
+     * @return メニュー画面
+     */
+    @PostMapping("/forced_logout")
+    public void forcedLogout(HttpSession session) {
+
+        // セッションをクリアする
+        session.invalidate();
+
+    }
 }
