@@ -54,8 +54,14 @@ public class EmployeeMstRepository {
         return result;
     }
 
-    // 検索・参照画面用社員情報取得
-    public List<UserDataDto> getEmpDataForSearchDetail(String teamId, String role) {
+    /**
+     * 検索・参照画面用社員情報取得
+     *
+     * @param unitNo ログインユーザーのユニットNO
+     * @param teamId ログインユーザーのチームID
+     * @param role ログインユーザーの役職
+     */
+    public List<UserDataDto> getEmpDataForSearchDetail(String unitNo, String teamId, String role) {
 
         String sql = """
                 SELECT
@@ -81,15 +87,22 @@ public class EmployeeMstRepository {
                 """;
 
         // 「社員名称｣検索処理((管理職付きの場合のみ実行する。)
-        // 'セッション.社員ID'に紐づく、社員マスタ.役職=2,3,4の場合(C以上MGR以下)
-        if (role.equals("2") || role.equals("3") || role.equals("4")) {
+        // 'セッション.社員ID'に紐づく、社員マスタ.役職=2,3の場合(C/LD)の場合
+        if (role.equals("2") || role.equals("3")) {
             sql = sql + " AND  emp.TEAM_ID = '" + teamId + "'";
+        }
+
+        // 'セッション.社員ID'に紐づく、社員マスタ.役職=4(AMG)の場合
+        if (role.equals("4")) {
+            sql = sql + " AND  team.UNIT_NO = '" + unitNo + "'";
         }
 
         // 'セッション.社員ID'に紐づく、社員マスタ.役職=5(MGR)の場合
         if (role.equals("5")) {
             sql = sql + " AND ( emp.TEAM_ID = '" + teamId + "' OR  emp.ROLE != '1')";
         }
+
+        sql += " ORDER BY ROLE DESC, (EMP_LNAME || EMP_FNAME) ASC ";
 
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
         List<UserDataDto> result = new ArrayList<>();
@@ -107,5 +120,6 @@ public class EmployeeMstRepository {
 
         return result;
     }
+
 
 }

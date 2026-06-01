@@ -150,7 +150,7 @@
                 <td th:text="${#temporals.format(item.registerDate.toLocalDateTime(), 'yyyy-MM-dd')}"></td>
                 <td th:text="${item.empName}"></td>
                 <td th:switch="${item.lateReasonCd}">
-                    <span th:case="'1'">電車遅刻</span>
+                    <span th:case="'1'">電車遅延</span>
                     <span th:case="'2'">その他</span>
                 </td>
                 <td th:text="${item.lineName}"></td>

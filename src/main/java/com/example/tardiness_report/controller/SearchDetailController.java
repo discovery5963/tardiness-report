@@ -57,7 +57,8 @@ public class SearchDetailController {
     @ModelAttribute("employeeList")
     public List<UserDataDto> getEmployeeList(HttpSession session) {
         return employeeMstRepository.getEmpDataForSearchDetail(
-                (String) session.getAttribute("teamId"), (String) session.getAttribute("role"));
+                (String) session.getAttribute("unitNo"), (String) session.getAttribute("teamId"),
+                (String) session.getAttribute("role"));
     }
 
     // 路線マスタ情報取得

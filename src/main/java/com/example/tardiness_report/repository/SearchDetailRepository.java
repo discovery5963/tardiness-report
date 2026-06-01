@@ -55,7 +55,7 @@ public class SearchDetailRepository {
     }
 
     /**
-     * 指定した従業員IDに紐づく遅刻理由の一覧をページングして取得または、CSVで全量出力する。
+     * 指定した従業員IDに紐づく遅刻理由の一覧をページングして取得、またはCSVで全量出力する。
      *
      * @param role ログインユーザーの役職
      * @param empID 検索対象の従業員ID（null不可）
