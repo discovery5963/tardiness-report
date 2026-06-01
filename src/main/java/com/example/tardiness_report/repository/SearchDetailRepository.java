@@ -85,6 +85,7 @@ public class SearchDetailRepository {
         // SQLクエリの作成
         String sql = """
                 SELECT
+                    LATE_REASON_ID,
                     EMP_NAME,
                     REGISTER_DATE,
                     LATE_REASON_CD,
@@ -110,7 +111,8 @@ public class SearchDetailRepository {
         List<SearchDetailDto> result = new ArrayList<>();
 
         for (Map<String, Object> row : rows) {
-            SearchDetailDto dto = SearchDetailDto.builder().empName((String) row.get("EMP_NAME"))
+            SearchDetailDto dto = SearchDetailDto.builder().lateReasonId((Long) row.get("LATE_REASON_ID"))
+            		.empName((String) row.get("EMP_NAME"))
                     .registerDate((Timestamp) row.get("REGISTER_DATE"))
                     .lateReasonCd((String) row.get("LATE_REASON_CD"))
                     .detail((String) row.get("DETAIL")).lineName((String) row.get("LINE_NAME"))

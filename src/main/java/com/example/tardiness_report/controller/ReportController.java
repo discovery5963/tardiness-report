@@ -87,7 +87,7 @@ public class ReportController {
                     .orElse(null);
             model.addAttribute("lineName", lineName);
             session.setAttribute("lineName", model.getAttribute("lineName"));
-            System.out.println("遅刻理由IDから当日のレコードヒット");
+            System.out.println("遅刻理由IDをもとにレコードヒット");
             session.setAttribute("existsFlg" , "1");
             model.addAttribute("existsFlg", "1");
             // セッションに遅刻理由IDが含まれていない場合、社員IDから当日の遅刻レコードを検索
@@ -240,7 +240,13 @@ public class ReportController {
         model.addAttribute("lineName", lineName);
         boolean errFlg = true;
         String lateReasonId = null;
-        errFlg = reportService.getTardinessRecord(model);
+        if (!Objects.isNull(session.getAttribute("lateReasonId"))) {
+            model.addAttribute("lateReasonId", session.getAttribute("lateReasonId"));
+            errFlg = reportService.getTodayTardinessRecord(model);
+        } else {
+            errFlg = reportService.getTardinessRecord(model);
+        }
+        
         if (!Objects.isNull(model.getAttribute("detail"))) {
             session.setAttribute("lateReasonId", model.getAttribute("lateReasonId"));
             lateReasonId = (String) session.getAttribute("lateReasonId");

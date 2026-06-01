@@ -160,7 +160,8 @@
                 </td>
                 <td th:text="${item.lineName}"></td>
                 <td th:text="${item.detail}"></td>
-                <td><button>編集</button></td>
+                <input type="hidden" id="lateReasonId" name="lateReasonId" th:value="${item.lateReasonId}" />
+                <td><button type="submit" name="doEdit">編集</button></td>
             </tr>
             </tbody>
         </table>

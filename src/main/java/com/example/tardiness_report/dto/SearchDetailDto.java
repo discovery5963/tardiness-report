@@ -10,6 +10,9 @@ import java.sql.Timestamp;
 /** 検索・参照画面DTO */
 public class SearchDetailDto {
 
+    /** 遅刻理由ID */
+    private Long lateReasonId;
+
     /** 社員ID */
     private String empId;
 

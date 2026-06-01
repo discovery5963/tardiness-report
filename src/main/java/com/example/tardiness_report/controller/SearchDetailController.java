@@ -8,6 +8,7 @@ import com.example.tardiness_report.repository.EmployeeMstRepository;
 import com.example.tardiness_report.repository.LineMstRepository;
 import com.example.tardiness_report.repository.SearchDetailRepository;
 import com.example.tardiness_report.service.SearchDetailService;
+import com.example.tardiness_report.controller.ReportController;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -241,6 +242,21 @@ public class SearchDetailController {
         model.addAttribute("isInitial", false); // 初期表示フラグ
         return "search-detail"; // 結果を同じ画面に表示
     }
+
+    /**
+     * 「編集ボタン」押下時処理
+     *
+     * @param form form入力値
+     * @param model モデル
+     * @param session セッション
+     * @return 報告画面（編集表示）
+     */
+    @PostMapping(value = "/search", params = "doEdit")
+    public String doEdit(@ModelAttribute SearchDetailForm form, HttpSession session) {
+                // 編集画面を呼び出し
+                session.setAttribute("lateReasonId", form.getLateReasonId().toString());
+                return "redirect:/report";
+            }
 
     /**
      * CSV出力ボタン押下時処理

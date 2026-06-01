@@ -49,6 +49,8 @@ public class SearchDetailForm {
     private int maxPageNumber;
 
     // 検索結果表示エリア2
+    /** 遅刻理由ID */
+    private Long lateReasonId;
     /** 日付 */
     private String registeredDate;
     /** 社員名 */
