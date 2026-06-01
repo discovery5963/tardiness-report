@@ -35,6 +35,7 @@ public class SearchDetailRepository {
      */
     public int getAllListCount(String role, String empID, String teamId, String lineId,
             String startDate, String endDate) {
+
         // 検索SQL（全件検索状態）
         String sql = """
                 SELECT
@@ -54,36 +55,32 @@ public class SearchDetailRepository {
     }
 
     /**
-     * 指定した従業員IDに紐づく遅刻理由の一覧をページングして取得する。
+     * 指定した従業員IDに紐づく遅刻理由の一覧をページングして取得または、CSVで全量出力する。
      *
      * @param role ログインユーザーの役職
      * @param empID 検索対象の従業員ID（null不可）
      * @param teamId 検索対象のチームID
      * @param startDate 検索対象の開始日付（登録日）。nullまたは空文字の場合は条件に含めない
      * @param endDate 検索対象の終了日付（登録日）。nullまたは空文字の場合は条件に含めない
-     * @param lineId 検索対象の路線ID。nullまたは
+     * @param lineId 検索対象の路線ID。
      * @param limitCount 取得する最大件数（ページサイズ）
      * @param currentPageNumber 現在のページ番号（1から開始）
+     * @param isCsvOutput CSV出力フラグ。trueの場合は全件取得、falseの場合はページングして取得
      * @return SearchDetailDto のリスト。該当なしの場合は空リストを返す。
      * @throws org.springframework.dao.DataAccessException JDBC 操作に失敗した場合にスローされる
      */
     public List<SearchDetailDto> getResultList(String role, String empID, String teamId,
-            String startDate, String endDate, String lineId, int limitCount,
-            int currentPageNumber) {
+            String startDate, String endDate, String lineId, int limitCount, int currentPageNumber,
+            boolean isCsvOutput) {
 
-        LocalDate startDateLD = null;
-        LocalDate endDateLD = null;
 
         // 値が設定されている場合は開始日付、終了日付をLocalDate型に変換
         if (startDate != null && !startDate.isEmpty()) {
-            startDateLD = LocalDate.parse(startDate);
+            LocalDate.parse(startDate);
         }
         if (endDate != null && !endDate.isEmpty()) {
-            endDateLD = LocalDate.parse(endDate);
+            LocalDate.parse(endDate);
         }
-
-        // オフセットの計算
-        int offsetValue = (currentPageNumber - 1) * limitCount;
 
         // SQLクエリの作成
         String sql = """
@@ -102,50 +99,13 @@ public class SearchDetailRepository {
         // SQLクエリに条件を追加
         sql = setCriteria(sql, role, empID, teamId, lineId, startDate, endDate);
 
-        sql += " ORDER BY REGISTER_DATE ";
-        sql += " LIMIT %d OFFSET %d".formatted(limitCount, offsetValue);
-
-        List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
-        List<SearchDetailDto> result = new ArrayList<>();
-
-        for (Map<String, Object> row : rows) {
-            SearchDetailDto dto = SearchDetailDto.builder().empName((String) row.get("EMP_NAME"))
-                    .registerDate((Timestamp) row.get("REGISTER_DATE"))
-                    .lateReasonCd((String) row.get("LATE_REASON_CD"))
-                    .detail((String) row.get("DETAIL")).lineName((String) row.get("LINE_NAME"))
-                    .build();
-
-            result.add(dto);
+        // CSV出力でない場合はページングのためのLIMITとOFFSETを追加
+        if (!isCsvOutput) {
+            // オフセットの計算
+            int offsetValue = (currentPageNumber - 1) * limitCount;
+            sql += " LIMIT %d OFFSET %d".formatted(limitCount, offsetValue);
         }
 
-        return result;
-    }
-
-    /**
-     * CSV出力するデータを取得する。（検索結果の全件を取得）
-     *
-     * @param form formで渡された検索条件
-     * @throws org.springframework.dao.DataAccessException JDBC 操作に失敗した場合にスローされる
-     */
-    public List<SearchDetailDto> getCsvOutput(SearchDetailForm form) {
-
-        // SQLクエリの作成
-        // TODO SQLの修正が必要（formから検索条件を指定）
-        String sql = String.format("""
-                SELECT
-                    EMP_NAME,
-                    REGISTER_DATE,
-                    LATE_REASON_CD,
-                    DETAIL,
-                    LINE_NAME
-                FROM
-                    SEARCH_LIST_VIEW
-                WHERE
-                    EMP_ID = '%s'
-                ORDER BY
-                    REGISTER_DATE
-                """, form.getEmpId());
-
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
         List<SearchDetailDto> result = new ArrayList<>();
 
@@ -155,6 +115,7 @@ public class SearchDetailRepository {
                     .lateReasonCd((String) row.get("LATE_REASON_CD"))
                     .detail((String) row.get("DETAIL")).lineName((String) row.get("LINE_NAME"))
                     .build();
+
             result.add(dto);
         }
 

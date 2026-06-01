@@ -98,11 +98,11 @@
         <!-- 初期表示＝falseの場合のみ表示 -->
         <table class='page_link' th:if="${!isInitial}">
           <tr>
+            <!-- 表示件数 -->
             <td><div class="left-align" style="display: inline-block;" th:text="${searchDetailForm.viewingDataCount}"></div>/
                 <span class="left-align" style="text-align:left;" th:text="${searchDetailForm.allDataCount}"></span>件
                 <input type="hidden" th:field="*{allDataCount}">
             </td>
-            <td>表示件数：<div class="center-align" style="display: inline-block;" th:text="${searchDetailForm.itemsPerPage}"></div>件</td>
 
             <td>
               <!-- 前へボタン押下時の処理 -->

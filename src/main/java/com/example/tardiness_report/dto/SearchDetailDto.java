@@ -28,6 +28,10 @@ public class SearchDetailDto {
     /** 遅刻理由コード */
     private String lateReasonCd;
 
+    /** 遅刻理由 */
+    private String lateReason;
+
+
     /** 路線名 */
     private String lineName;
 
