@@ -34,13 +34,19 @@ public class SearchDetailForm {
     /** 総件数 */
     private int allDataCount;
     /** ページ毎表示件数 */
-    private int itemsDisplayed;
+    private int itemsPerPage;
     /** 開始ページ件数 */
     private int startPageNumber;
     /** 終了ページ件数 */
     private int endPageNumber;
     // DB項目以外（これより↑はすべて別クラスに移動する
     // TODO
+    /** 最後のページ判定フラグ */
+    private boolean isLastPage;
+    /** 表示件数 */
+    private String viewingDataCount;
+    /** 最大ページ番号 */
+    private int maxPageNumber;
 
     // 検索結果表示エリア2
     /** 日付 */

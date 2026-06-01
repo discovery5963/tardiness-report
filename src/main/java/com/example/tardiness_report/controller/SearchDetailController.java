@@ -123,6 +123,7 @@ public class SearchDetailController {
                 searchDetailRepository.getAllListCount(String.valueOf(session.getAttribute("role")),
                         empID, String.valueOf(session.getAttribute("teamId")), form.getLineId(),
                         form.getStartDate(), form.getEndDate());
+        form.setAllDataCount(allCount);
 
         // 表示用にページングされたリストを取得
         List<SearchDetailDto> resultList = searchDetailRepository.getResultList(
@@ -130,18 +131,16 @@ public class SearchDetailController {
                 String.valueOf(session.getAttribute("teamId")), form.getStartDate(),
                 form.getEndDate(), form.getLineId(), ITEMS_PER_PAGE, form.getCurrentPageNumber());
 
-        int startIndex = (form.getCurrentPageNumber() - 1) * ITEMS_PER_PAGE + 1;
-        int endIndex = Math.min(form.getCurrentPageNumber() * ITEMS_PER_PAGE, allCount);
-        // formにsetすべきかも（htmlも修正必要・）
-        String viewingDataCount = startIndex + "〜" + endIndex + "件";
+        // ページネーション時共通処理
+        commonUtil(form, model, session);
+
+        // 最大ページ番号計算
+        int maxPageNum = (int) Math.ceil((double) form.getAllDataCount() / form.getItemsPerPage());
+        form.setMaxPageNumber(maxPageNum);
 
         model.addAttribute("searchDetailForm", form); // これで十分なはず
         model.addAttribute("resultList", resultList);
-        model.addAttribute("allCount", allCount);
         model.addAttribute("isInitial", false); // 初期表示フラグOFF
-
-        model.addAttribute("currentPageNumber", form.getCurrentPageNumber()); // 現在のページ番号をモデルに追加
-        model.addAttribute("viewingDataCount", viewingDataCount); // 表示件数をモデルに追加
         model.addAttribute("itemsPerPage", ITEMS_PER_PAGE); // ページ毎の表示件数をモデルに追加
         return "search-detail"; // 結果を同じ画面に表示
     }
@@ -170,6 +169,9 @@ public class SearchDetailController {
         // ページ番号を減算
         form.setCurrentPageNumber(form.getCurrentPageNumber() - 1);
 
+        // 表示件数の計算
+        commonUtil(form, model, session);
+
         // 表示用にページングされたリストを取得
         List<SearchDetailDto> resultList = searchDetailRepository.getResultList(
                 String.valueOf(session.getAttribute("role")), empID,
@@ -180,7 +182,6 @@ public class SearchDetailController {
         model.addAttribute("searchDetailForm", form);
         model.addAttribute("resultList", resultList);
         model.addAttribute("isInitial", false); // 初期表示フラグ
-        model.addAttribute("currentPageNumber", form.getCurrentPageNumber()); // 現在のページ番号をモデルに追加
         return "search-detail"; // 結果を同じ画面に表示
     }
 
@@ -209,11 +210,11 @@ public class SearchDetailController {
         form.setCurrentPageNumber(form.getCurrentPageNumber() + 1);
 
         // 最後のページ判定
-        // TODO: 現在のページ番号と総件数から最後のページかどうかを判定するロジックを実装する必要あり。
-        // TODO：セッションに格納する？
-        // boolean isLastPage = (form.getCurrentPageNumber() + 1)
-        // * ITEMS_PER_PAGE >= (Integer) model.getAttribute("allCount");
-        // <button th:disabled="${isLastPage}">次へ</button>
+        boolean isLastPage = form.getCurrentPageNumber() * ITEMS_PER_PAGE >= form.getAllDataCount();
+        form.setLastPage(isLastPage);
+
+        // 表示件数の計算
+        commonUtil(form, model, session);
 
         // 表示用にページングされたリストを取得
         List<SearchDetailDto> resultList = searchDetailRepository.getResultList(
@@ -225,7 +226,6 @@ public class SearchDetailController {
         model.addAttribute("searchDetailForm", form);
         model.addAttribute("resultList", resultList);
         model.addAttribute("isInitial", false); // 初期表示フラグ
-        model.addAttribute("currentPageNumber", form.getCurrentPageNumber()); // 現在のページ番号をモデルに追加
         return "search-detail"; // 結果を同じ画面に表示
     }
 
@@ -237,28 +237,55 @@ public class SearchDetailController {
      * @return 検索・参照画面(初期表示)
      */
     @PostMapping(value = "/search", params = "csvOutput")
-    public void csvOutput(@ModelAttribute SearchDetailForm form, Model model, HttpServletResponse response) {
+    public void csvOutput(@ModelAttribute SearchDetailForm form, Model model,
+            HttpServletResponse response) {
         // CSV出力
         List<SearchDetailDto> searchResultList = searchDetailRepository.getCsvOutput(form);
 
         try {
-        response.setContentType("text/csv; charset=UTF-8");
-        response.setHeader("Content-Disposition", "attachment; filename=report.csv");
+            response.setContentType("text/csv; charset=UTF-8");
+            response.setHeader("Content-Disposition", "attachment; filename=report.csv");
 
-        PrintWriter writer = response.getWriter();
+            PrintWriter writer = response.getWriter();
 
             // ヘッダー行
             writer.println("日付,社員名,理由,路線,内容");
 
             // データ行
             for (SearchDetailDto dto : searchResultList) {
-              writer.println(dto.getRegisterDate() + "," + dto.getEmpLname() + " " + dto.getEmpFname() + "," + dto.getDetail() + ",");
+                writer.println(dto.getRegisterDate() + "," + dto.getEmpLname() + " "
+                        + dto.getEmpFname() + "," + dto.getDetail() + ",");
             }
 
             writer.flush();
         } catch (IOException e) {
             throw new RuntimeException("CSV 出力中にエラーが発生しました", e);
         }
+    }
+
+
+    /**
+     * 共通処理：ページネーション時共通処理
+     *
+     * @param form form入力値
+     * @param model モデル
+     * @param session セッション
+     * @return 表示件数（xx ~ xx 件)の文字列
+     */
+    public void commonUtil(@ModelAttribute SearchDetailForm form, Model model,
+            HttpSession session) {
+
+        // ページ毎の表示件数
+        form.setItemsPerPage(ITEMS_PER_PAGE);
+
+        // 表示件数（xx ~ xx 件)の計算
+        int startIndex = (form.getCurrentPageNumber() - 1) * ITEMS_PER_PAGE + 1;
+        int endIndex =
+                Math.min(form.getCurrentPageNumber() * ITEMS_PER_PAGE, form.getAllDataCount());
+
+        String viewingDataCount = startIndex + "〜" + endIndex + "件";
+        form.setViewingDataCount(viewingDataCount);
+
     }
 
     // /**
