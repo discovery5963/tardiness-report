@@ -1,5 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Select2 -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <head>
     <meta charset="UTF-8">
@@ -7,6 +13,14 @@
     <link rel="stylesheet" href="css/common.css">
     <link rel="stylesheet" href="css/report.css">
     <title>報告画面</title>
+            <!-- 路線・社員名選択用 -->
+        <script>
+            $(document).ready(function() {
+                $('#line-select').select2({
+                placeholder: '検索ワードを入力'
+                });
+            });
+        </script>
 </head>
 
 <body>
@@ -14,9 +28,9 @@
     <form action="/resist" method="post">
     <div id="report" class="hidden">
         <div>
-            <h1 id="notexists" class="hidden">初回</h1>
-            <h1 id="exists">連絡登録</h1>
-        </div>
+            <h1 id="exists" th:text="${existsFlg} ? '初回連絡登録' : '到着連絡登録'">
+            </h1>
+            </div>
         <!-- フォーマット選択、路線検索、検索ボタン -->
         <div class="containerWrapper">
             <div class="format">
@@ -37,7 +51,8 @@
                                     th:each="item : ${lineList}"
                                     th:value="${item.lineId}"
                                     th:text="${item.lineName}"
-                                    th:attr="data-line-name=${item.lineName}">
+                                    th:attr="data-line-name=${item.lineName}"
+                                    th:selected="${item.lineId == selectedLineId}">
                                 </option>
                             </select>
                             <input type="hidden" name="lineName" id="lineName">
@@ -48,9 +63,8 @@
                 <div id="free">
                     <div>
                         <p>内容</p>
-                        <textarea class="inputDetail" name="inputDetail" th:text="${inputDetail}">
-                </textarea>
-                <div>※500文字以内で入力してください。</div>
+                        <textarea class="inputDetail" name="inputDetail" th:text="${inputDetail}"></textarea>
+                        <div>※500文字以内で入力してください。</div>
                     </div>
                 </div>
             </div>
@@ -105,6 +119,8 @@
         report.classList.remove("hidden");
         if (formatFlg == 1) {
             train.classList.remove("hidden");
+        } else {
+            free.classList.remove("hidden");
         }
     // 確認画面
     } else if (typeFlg == 2) {
@@ -112,12 +128,6 @@
         if (formatFlg == 2) {
             train.classList.remove("hidden");
         }
-    }
-
-    if(existsFlg == true){
-        exists.classList.remove("hidden");
-    } else if(existsFlg == false){
-        notexists.classList.remove("hidden");
     }
 
     const menu = document.getElementById('format');
@@ -130,6 +140,26 @@
         }
     });
 
+const textarea = document.getElementsByName('inputDetail')[0];
+
+menu.addEventListener('change', (event) => {
+    const selectedItem = event.target.value;
+
+    if (selectedItem === "train") {
+        train.classList.remove("hidden");
+        textarea.value = "電車遅延時間：分\r\n" + "現場遅刻時間：分";
+    } else if (selectedItem === "free") {
+        train.classList.add("hidden");
+        textarea.value = "遅刻理由：\r\n" + "到着予定時刻：\r\n" + "業務開始時刻：";
+    }
+});
+window.addEventListener('load', () => {
+    if (existsFlg == 1) {
+        title.textContent = "連絡更新";
+    } else {
+        title.textContent = "連絡登録";
+    }
+});
 </script>
 
 </html>

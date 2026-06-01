@@ -45,8 +45,8 @@ public class ReportController {
         boolean errFlg = false;
 
         // 存在フラグ
-        model.addAttribute("existsFlg", false);
-        session.setAttribute("existsFlg" , false);
+        model.addAttribute("existsFlg", "0");
+        session.setAttribute("existsFlg" , "0");
         // 路線名の取得
         List<LineMstDto> lineList = lineMstRepository.getAllLineMstData();
         model.addAttribute("lineList", lineList); // "lineList"としてhtmlに連携する。
@@ -88,8 +88,8 @@ public class ReportController {
             model.addAttribute("lineName", lineName);
             session.setAttribute("lineName", model.getAttribute("lineName"));
             System.out.println("遅刻理由IDから当日のレコードヒット");
-            session.setAttribute("existsFlg" , true);
-            model.addAttribute("existsFlg", true);
+            session.setAttribute("existsFlg" , "1");
+            model.addAttribute("existsFlg", "1");
             // セッションに遅刻理由IDが含まれていない場合、社員IDから当日の遅刻レコードを検索
         } else {
             errFlg = reportService.getTardinessRecord(model);
@@ -107,8 +107,8 @@ public class ReportController {
                 session.setAttribute("lineName", model.getAttribute("lineName"));
                 session.setAttribute("format", model.getAttribute("late_reason_cd"));
                 System.out.println("社員IDから当日の遅刻レコードヒット");
-                session.setAttribute("existsFlg" , true);
-                model.addAttribute("existsFlg", true);
+                session.setAttribute("existsFlg" , "1");
+                model.addAttribute("existsFlg", "1");
             }
         }
 
@@ -147,6 +147,7 @@ public class ReportController {
         }
         session.setAttribute("resistFlg", model.getAttribute("resistFlg"));
         model.addAttribute("existsFlg", model.getAttribute("existsFlg"));
+        model.addAttribute("selectedLineId", model.getAttribute("lineId"));
         return "report";
     }
 
@@ -158,8 +159,8 @@ public class ReportController {
             @RequestParam("format") String format,
             @RequestParam("lineId") String lineId,
             @RequestParam("lineName") String lineName) {
-        session.setAttribute("existsFlg" , true);
-        model.addAttribute("existsFlg", true);
+        session.setAttribute("existsFlg" , "1");
+        model.addAttribute("existsFlg", "1");
         String empId = (String) session.getAttribute("empId");
         if ("train".equals(format)) {
             format = "1";
@@ -261,6 +262,8 @@ public class ReportController {
         }
         model.addAttribute("formatFlg", format);
         model.addAttribute("typeFlg", 1);
+
+        model.addAttribute("selectedLineId", model.getAttribute("lineId"));
         return "report";
     }
 }
