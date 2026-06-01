@@ -14,7 +14,8 @@
     <form action="/resist" method="post">
     <div id="report" class="hidden">
         <div>
-            <h1>初回連絡登録</h1>
+            <h1 id="notexists" class="hidden">初回</h1>
+            <h1 id="exists">連絡登録</h1>
         </div>
         <!-- フォーマット選択、路線検索、検索ボタン -->
         <div class="containerWrapper">
@@ -62,7 +63,7 @@
         <h1>
             登録内容表示
         </h1>
-        <p class="updateMessage">登録完了しました！</p>
+        <p class="updateMessage" style="color:red">登録完了しました！</p>
         <div class="confirmDetail">
             <div>
                 <p>使用路線</p>
@@ -87,6 +88,8 @@
     const typeFlg = [[${typeFlg}]];
     // フォーマットフラグ
     const formatFlg = [[${formatFlg}]];
+    // 存在フラグ
+    const existsFlg = [[${existsFlg}]];
     const train = document.getElementById("train");
     const free = document.getElementById("free");
     const report = document.getElementById("report");
@@ -106,6 +109,15 @@
     // 確認画面
     } else if (typeFlg == 2) {
         confirm.classList.remove("hidden");
+        if (formatFlg == 2) {
+            train.classList.remove("hidden");
+        }
+    }
+
+    if(existsFlg == true){
+        exists.classList.remove("hidden");
+    } else if(existsFlg == false){
+        notexists.classList.remove("hidden");
     }
 
     const menu = document.getElementById('format');
