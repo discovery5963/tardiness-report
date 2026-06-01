@@ -36,7 +36,7 @@
         <fieldset>
            <legend>検索条件</legend>
            <div class="search-row">
-            <!-- 期間 -->
+             <!-- 期間 -->
              <div class="form-group">
                <label>期間:</label>
                <div class="inline-inputs">
@@ -63,59 +63,69 @@
 
              </div>
              <!-- 社員名称 -->
-             <div class="form-group">
-             <label>社員名称:</label>
-               <select id="employee-select" th:field="*{empId}">
-                   <option value=""></option>
-                   <option
-                       th:each="item : ${employeeList}"
-                       th:value="${item.empId}"
-                       th:text="${item.empLname + ' ' + item.empFname}"
-                       th:selected="${item.empId == searchDetailForm.empId}">
-                   </option>
-               </select>
+             <!-- 開始 ログインユーザの役職の値が1より大きい場合(=管理者者)のみ表示 -->
+             <div th:if="${session.role > '1'}">
+                 <div class="form-group">
+                     <label>社員名称:</label>
+                     <select id="employee-select" th:field="*{empId}">
+                         <option value=""></option>
+                         <option
+                             th:each="item : ${employeeList}"
+                             th:value="${item.empId}"
+                             th:text="${item.empLname + ' ' + item.empFname}"
+                             th:selected="${item.empId == searchDetailForm.empId}">
+                         </option>
+                     </select>
+                 </div>
              </div>
+             <!-- 終了 ログインユーザの役職の値が1より大きい場合(=管理者者の場合)のみ表示 -->
          
              <!-- 検索ボタン -->
              <div class="form-group">
-               <label>&nbsp;</label>
-               <!-- <button>検索</button> -->
-               <button type="submit" name="doSearch">検索</button>
+                 <label>&nbsp;</label>
+                 <button type="submit" name="doSearch">検索</button>
              </div>
+
+             <!-- エラーメッセージ -->
              <div th:if="${errorMessage}">
-              <p th:text="${errorMessage}" style="color: #ff0000;"></p>
+                 <p th:text="${errorMessage}" style="color: #ff0000;"></p>
              </div>
+
            </div>
         </fieldset>
 
 
         <!-- 初期表示＝falseの場合のみ表示 -->
-        <!-- <span>表示件数: 10　1～10件／〇〇件　ページ: 1/5</span> -->
-        <!-- <button style="float: right;">CSV出力</button> -->
         <table class='page_link' th:if="${!isInitial}">
           <tr>
-            <td><div class="left-align" style="display: inline-block;" th:text="${viewingDataCount}"></div>/</td>
-            <td><div class="left-align" style="display: inline-block;" th:text="${allCount}"></div>件</td>
-            <td><div class="center-align" style="display: inline-block;" th:text="${itemsPerPage}"></div>件</td>
+            <td><div class="left-align" style="display: inline-block;" th:text="${searchDetailForm.viewingDataCount}"></div>/
+                <span class="left-align" style="text-align:left;" th:text="${searchDetailForm.allDataCount}"></span>件
+                <input type="hidden" th:field="*{allDataCount}">
+            </td>
+            <td>表示件数：<div class="center-align" style="display: inline-block;" th:text="${searchDetailForm.itemsPerPage}"></div>件</td>
+
             <td>
               <!-- 前へボタン押下時の処理 -->
               <div class="right-align">
-                  <input type="submit" id="previousPage" name="goPrevious" value="◀" class="btn btn-secondary" th:disabled="${currentPageNumber == 1}"/>
+                  <input type="submit" id="previousPage" name="goPrevious" value="◀" class="btn btn-secondary" th:disabled="${searchDetailForm.currentPageNumber == 1}"/>
                   <!-- <input type="hidden" id="screen" name="screen" value="検索・参照画面" /> -->
-                  <input type="hidden" name="currentPageNumber" th:value="${currentPageNumber}" />
+                  <input type="hidden" name="currentPageNumber" th:value="${searchDetailForm.currentPageNumber}"/>
                   <input type="hidden" id="action" name="action" value="prev"/>
-                  <input type="hidden" id="previousPageLinkFlg" name="previousPageLinkFlg" value= "{{.PreviousPageLinkFlg}}"/>
+                  <!-- <input type="hidden" id="previousPageLinkFlg" name="previousPageLinkFlg" value= "{{.PreviousPageLinkFlg}}"/> -->
+                </div>
             </td>
-              </div>
-            <td><div class="right-align">1/5</div></td>
+            <!-- <td><div class="right-align">1/5</div></td> -->
+            <td><div class="right-align" style="display: inline-block;" th:text="${searchDetailForm.currentPageNumber}"></div>/<div class="right-align" style="display: inline-block;" th:text="${searchDetailForm.maxPageNumber}"></div>
+                <input type="hidden" name="maxPageNumber" th:value="${searchDetailForm.maxPageNumber}">
+            </td>
             <td>
               <!-- 次へボタン押下時の処理 -->
               <div class="right-align">
-                  <input type="submit" id="nextPage" name="goNext" value="▶" class="btn btn-secondary" />
+                  <input type="submit" id="nextPage" name="goNext" value="▶" class="btn btn-secondary" th:disabled="${searchDetailForm.lastPage}" />
                   <input type="hidden" id="screen" name="screen" value="検索・参照画面" />
-                  <input type="hidden" name="currentPageNumber" th:value="${currentPageNumber}" />
+                  <input type="hidden" name="currentPageNumber" th:value="${searchDetailForm.currentPageNumber}" />
                   <input type="hidden" id="action" name="action" value= "next"/>
-                  <input type="hidden" id="nextPageLinkFlg" name="nextPageLinkFlg" value= "{{.NextPageLinkFlg}}"/>
+                  <!-- <input type="hidden" id="nextPageLinkFlg" name="nextPageLinkFlg" value= "{{.NextPageLinkFlg}}"/> -->
               </div>
             </td>
             <td><button type="submit" name="csvOutput" style="float: right;">CSV出力</button></td>
@@ -138,7 +148,7 @@
             <tbody>
             <tr th:each="item : ${resultList}">
                 <td th:text="${#temporals.format(item.registerDate.toLocalDateTime(), 'yyyy-MM-dd')}"></td>
-                <td th:text="${item.empLname + ' ' + item.empFname}"></td>
+                <td th:text="${item.empName}"></td>
                 <td th:switch="${item.lateReasonCd}">
                     <span th:case="'1'">電車遅刻</span>
                     <span th:case="'2'">その他</span>
