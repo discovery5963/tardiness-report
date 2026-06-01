@@ -36,7 +36,7 @@
         <fieldset>
            <legend>検索条件</legend>
            <div class="search-row">
-            <!-- 期間 -->
+             <!-- 期間 -->
              <div class="form-group">
                <label>期間:</label>
                <div class="inline-inputs">
@@ -63,35 +63,39 @@
 
              </div>
              <!-- 社員名称 -->
-             <div class="form-group">
-             <label>社員名称:</label>
-               <select id="employee-select" th:field="*{empId}">
-                   <option value=""></option>
-                   <option
-                       th:each="item : ${employeeList}"
-                       th:value="${item.empId}"
-                       th:text="${item.empLname + ' ' + item.empFname}"
-                       th:selected="${item.empId == searchDetailForm.empId}">
-                   </option>
-               </select>
+             <!-- 開始 ログインユーザの役職の値が1より大きい場合(=管理者者)のみ表示 -->
+             <div th:if="${session.role > '1'}">
+                 <div class="form-group">
+                     <label>社員名称:</label>
+                     <select id="employee-select" th:field="*{empId}">
+                         <option value=""></option>
+                         <option
+                             th:each="item : ${employeeList}"
+                             th:value="${item.empId}"
+                             th:text="${item.empLname + ' ' + item.empFname}"
+                             th:selected="${item.empId == searchDetailForm.empId}">
+                         </option>
+                     </select>
+                 </div>
              </div>
+             <!-- 終了 ログインユーザの役職の値が1より大きい場合(=管理者者の場合)のみ表示 -->
          
              <!-- 検索ボタン -->
              <div class="form-group">
-               <label>&nbsp;</label>
-               <!-- <button>検索</button> -->
-               <button type="submit" name="doSearch">検索</button>
+                 <label>&nbsp;</label>
+                 <button type="submit" name="doSearch">検索</button>
              </div>
+
+             <!-- エラーメッセージ -->
              <div th:if="${errorMessage}">
-              <p th:text="${errorMessage}" style="color: #ff0000;"></p>
+                 <p th:text="${errorMessage}" style="color: #ff0000;"></p>
              </div>
+
            </div>
         </fieldset>
 
 
         <!-- 初期表示＝falseの場合のみ表示 -->
-        <!-- <span>表示件数: 10　1～10件／〇〇件　ページ: 1/5</span> -->
-        <!-- <button style="float: right;">CSV出力</button> -->
         <table class='page_link' th:if="${!isInitial}">
           <tr>
             <td><div class="left-align" style="display: inline-block;" th:text="${searchDetailForm.viewingDataCount}"></div>/
