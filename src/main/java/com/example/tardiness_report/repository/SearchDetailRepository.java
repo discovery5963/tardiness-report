@@ -2,21 +2,14 @@ package com.example.tardiness_report.repository;
 
 import com.example.tardiness_report.dto.SearchDetailDto;
 import com.example.tardiness_report.dto.SearchDetailForm;
-import com.example.tardiness_report.dto.UserDataDto;
 
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.Timestamp;
-import java.sql.Types;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -138,35 +131,30 @@ public class SearchDetailRepository {
 
         // SQLクエリの作成
         // TODO SQLの修正が必要（formから検索条件を指定）
-        String sql = String.format(
-                        """
-                        SELECT
-                            EMP_NAME,
-                            REGISTER_DATE,
-                            LATE_REASON_CD,
-                            DETAIL,
-                            LINE_NAME
-                        FROM
-                            SEARCH_LIST_VIEW
-                        WHERE
-                            EMP_ID = '%s'
-                        ORDER BY
-                            REGISTER_DATE
-                        """,
-                        form.getEmpId());
-        
+        String sql = String.format("""
+                SELECT
+                    EMP_NAME,
+                    REGISTER_DATE,
+                    LATE_REASON_CD,
+                    DETAIL,
+                    LINE_NAME
+                FROM
+                    SEARCH_LIST_VIEW
+                WHERE
+                    EMP_ID = '%s'
+                ORDER BY
+                    REGISTER_DATE
+                """, form.getEmpId());
+
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
         List<SearchDetailDto> result = new ArrayList<>();
 
         for (Map<String, Object> row : rows) {
-            SearchDetailDto dto =
-                    SearchDetailDto.builder()
-                            .empName((String) row.get("EMP_NAME"))
-                            .registerDate((Timestamp) row.get("REGISTER_DATE"))
-                            .lateReasonCd((String) row.get("LATE_REASON_CD"))
-                            .detail((String) row.get("DETAIL"))
-                            .lineName((String) row.get("LINE_NAME"))
-                            .build();
+            SearchDetailDto dto = SearchDetailDto.builder().empName((String) row.get("EMP_NAME"))
+                    .registerDate((Timestamp) row.get("REGISTER_DATE"))
+                    .lateReasonCd((String) row.get("LATE_REASON_CD"))
+                    .detail((String) row.get("DETAIL")).lineName((String) row.get("LINE_NAME"))
+                    .build();
             result.add(dto);
         }
 
