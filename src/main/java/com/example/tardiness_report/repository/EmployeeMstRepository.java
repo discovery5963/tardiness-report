@@ -93,13 +93,14 @@ public class EmployeeMstRepository {
         }
 
         // 'セッション.社員ID'に紐づく、社員マスタ.役職=4(AMG)の場合
+        // TODO:AMGとMGRの違いを確認
         if (role.equals("4")) {
             sql = sql + " AND  team.UNIT_NO = '" + unitNo + "'";
         }
 
         // 'セッション.社員ID'に紐づく、社員マスタ.役職=5(MGR)の場合
         if (role.equals("5")) {
-            sql = sql + " AND ( emp.TEAM_ID = '" + teamId + "' OR  emp.ROLE != '1')";
+            sql = sql + " AND  team.UNIT_NO = '" + unitNo + "'";
         }
 
         sql += " ORDER BY ROLE DESC, (EMP_LNAME || EMP_FNAME) ASC ";
