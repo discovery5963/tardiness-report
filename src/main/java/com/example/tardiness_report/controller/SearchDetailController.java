@@ -20,7 +20,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.List;
@@ -318,7 +321,12 @@ public class SearchDetailController {
             response.setContentType("text/csv; charset=UTF-8");
             response.setHeader("Content-Disposition", "attachment; filename=report.csv");
 
-            PrintWriter writer = response.getWriter();
+            // BOM を書く
+            OutputStream out = response.getOutputStream();
+            out.write(new byte[]{(byte)0xEF, (byte)0xBB, (byte)0xBF});
+
+            // UTF-8 の Writer を OutputStream に乗せる
+            PrintWriter writer = new PrintWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8));
 
             // ヘッダー行の設定
             writer.println("日付,社員名,理由,路線,内容");
