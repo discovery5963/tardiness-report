@@ -22,6 +22,7 @@
                 $('#format').on('change', function (event) {
                     const selectedItem = $(this).val();
 
+                    // フォーマット表示改修
                     if (selectedItem === "train") {
                         $('#train').removeClass('hidden');
                         textarea.value = "電車遅延時間：分\r\n現場遅刻時間：分";
