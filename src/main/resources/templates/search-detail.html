@@ -161,7 +161,8 @@
                 <td th:text="${item.lineName}"></td>
                 <td th:text="${item.detail}" style="text-align: left;"></td>
                 <td>
-                    <div th:if="${empLname+empFname} == ${item.empName} ">
+                    <div th:if="${(empLname + empFname) == item.empName 
+                    && #temporals.format(item.registerDate.toLocalDateTime(), 'yyyy-MM-dd') == #dates.format(#dates.createNow(), 'yyyy-MM-dd')} ">
                         <form action="/search" method="post">
                             <input type="hidden" id="lateReasonId" name="lateReasonId" th:value="${item.lateReasonId}" />
                             <button type="submit" name="doEdit">編集</button>
