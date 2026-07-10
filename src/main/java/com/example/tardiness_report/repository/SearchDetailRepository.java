@@ -98,6 +98,9 @@ public class SearchDetailRepository {
         // SQLクエリに条件を追加
         sql = setCriteria(sql, role, empID, teamId, lineId, startDate, endDate);
 
+        // sqlの取得順序を最新から降順に設定
+        sql = sql + " ORDER BY REGISTER_DATE DESC";
+
         // CSV出力でない場合はページングのためのLIMITとOFFSETを追加
         if (!isCsvOutput) {
             // 総件数が0件の場合の防御措置（オフセットの計算の為）
