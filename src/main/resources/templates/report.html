@@ -15,11 +15,22 @@
     <title>報告画面</title>
     <!-- 路線・社員名選択用 -->
     <script>
-        $(document).ready(function () {
-            $('#line-select').select2({
-                placeholder: '検索ワードを入力'
-            });
-            $('#format').select2();
+            $(document).ready(function () {
+                $('#line-select').select2({
+                    placeholder: '検索ワードを入力'
+                });
+                $('#format').on('change', function (event) {
+                    const selectedItem = $(this).val();
+
+                    // フォーマット表示改修
+                    if (selectedItem === "train") {
+                        $('#train').removeClass('hidden');
+                        textarea.value = "電車遅延時間：分\r\n現場遅刻時間：分";
+                    } else {
+                        $('#train').addClass('hidden');
+                        textarea.value = "遅刻理由：\r\n到着予定時刻：\r\n業務開始時刻：";
+                    }
+                });
         });
     </script>
 
@@ -150,13 +161,6 @@
         } else if (selectedItem === "free") {
             train.classList.add("hidden");
             textarea.value = "遅刻理由：\r\n" + "到着予定時刻：\r\n" + "業務開始時刻：";
-        }
-    });
-    window.addEventListener('load', () => {
-        if (existsFlg == 1) {
-            title.textContent = "連絡更新";
-        } else {
-            title.textContent = "連絡登録";
         }
     });
 
