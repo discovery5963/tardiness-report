@@ -160,8 +160,12 @@
                 </td>
                 <td th:text="${item.lineName}"></td>
                 <td th:text="${item.detail}" style="text-align: left;"></td>
-                <input type="hidden" id="lateReasonId" name="lateReasonId" th:value="${item.lateReasonId}" />
-                <td><button type="submit" name="doEdit">編集</button></td>
+                <td>
+                    <form action="/search" method="post">
+                        <input type="hidden" id="lateReasonId" name="lateReasonId" th:value="${item.lateReasonId}" />
+                        <button type="submit" name="doEdit">編集</button>
+                    </form>
+                </td>
             </tr>
             </tbody>
         </table>
