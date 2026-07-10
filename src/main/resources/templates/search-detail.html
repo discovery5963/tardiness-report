@@ -162,7 +162,7 @@
                 <td th:text="${item.detail}" style="text-align: left;"></td>
                 <td>
                     <div th:if="${(empLname + empFname) == item.empName 
-                    && #temporals.format(item.registerDate.toLocalDateTime(), 'yyyy-MM-dd') == #dates.format(#dates.createNow(), 'yyyy-MM-dd')} ">
+                        && #temporals.format(item.registerDate.toLocalDateTime(), 'yyyy-MM-dd') == #dates.format(#dates.createNow(), 'yyyy-MM-dd')} ">
                         <form action="/search" method="post">
                             <input type="hidden" id="lateReasonId" name="lateReasonId" th:value="${item.lateReasonId}" />
                             <button type="submit" name="doEdit">編集</button>
@@ -174,5 +174,37 @@
         </table>
         <!-- 初期表示＝falseの場合のみ表示 -->
         </form>
+        <script>
+            const option = document.getElementById('line-select');
+            const checkbox = document.getElementById('islineOthers');
+
+            function updateState() {
+
+                // ① checkbox が選択された → option をクリアして非活性
+                if (checkbox.checked) {
+                    const selectedOption = option.options[option.selectedIndex];
+                    selectedOption.removeAttribute("selected");
+                    option.selectedIndex = 0;
+                    option.disabled = true;
+                    checkbox.disabled = false;
+                    return;
+                }
+
+                // ② option が選択された → checkbox を非活性
+                if (option.value !== "") {
+                    checkbox.disabled = true;
+                    option.disabled = false;
+                    return;
+                }
+
+                // ③ option が空 & checkbox 未選択 → 両方活性
+                option.disabled = false;
+                checkbox.disabled = false;
+            }
+
+            updateState();
+            option.addEventListener('change', updateState);
+            checkbox.addEventListener('input', updateState);
+        </script>
     </body>
 </html>
