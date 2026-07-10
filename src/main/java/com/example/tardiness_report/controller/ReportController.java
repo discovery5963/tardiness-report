@@ -73,7 +73,7 @@ public class ReportController {
         // テスト用
         // session.setAttribute("lateReasonId", "83");
 
-        // セッションに遅刻理由IDが含まれている場合、遅刻理由IDから当日の遅刻レコードを検索
+        // セッションに遅刻理由IDが含まれている場合、遅刻理由IDから遅刻レコードを検索
         if (!Objects.isNull(session.getAttribute("lateReasonId"))) {
             model.addAttribute("lateReasonId", session.getAttribute("lateReasonId"));
             errFlg = reportService.getTodayTardinessRecord(model);
@@ -193,9 +193,7 @@ public class ReportController {
         model.addAttribute("typeFlg", 2);
         String lateReasonCd = format;
         String lateReasonId = null;
-        errFlg = reportService.getTardinessRecord(model);
-        if (!Objects.isNull(model.getAttribute("detail"))) {
-            session.setAttribute("lateReasonId", model.getAttribute("lateReasonId"));
+        if (!Objects.isNull(session.getAttribute("lateReasonId"))) {
             lateReasonId = (String) session.getAttribute("lateReasonId");
             session.setAttribute("resistFlg", 2);
         }
@@ -204,6 +202,8 @@ public class ReportController {
         if (session.getAttribute("resistFlg").equals(1)) {
             // INSERT処理
             lateReasonRepository.insertLateReason(empId, lateReasonCd, format, lineId, inputDetail);
+            errFlg = reportService.getTardinessRecord(model);
+            session.setAttribute("lateReasonId", model.getAttribute("lateReasonId"));
         } else if (session.getAttribute("resistFlg").equals(2)) {
             // UPDATE処理
             lateReasonRepository.updateLateReason(lateReasonCd, format, lineId, inputDetail, lateReasonId);

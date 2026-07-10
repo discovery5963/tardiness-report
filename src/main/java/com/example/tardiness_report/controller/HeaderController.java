@@ -18,6 +18,8 @@ public class HeaderController {
     @GetMapping("/menuReturn")
     public String menuReturn(Model model, HttpSession session) {
 
+        session.setAttribute("inputDetail", null);
+        session.setAttribute("lateReasonId", null);
         // メニュー画面へ遷移
         return "menu";
     }
