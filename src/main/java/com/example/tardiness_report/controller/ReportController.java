@@ -87,6 +87,7 @@ public class ReportController {
                     .orElse(null);
             model.addAttribute("lineName", lineName);
             session.setAttribute("lineName", model.getAttribute("lineName"));
+            session.setAttribute("format", model.getAttribute("format"));
             System.out.println("遅刻理由IDをもとにレコードヒット");
             session.setAttribute("existsFlg" , "1");
             model.addAttribute("existsFlg", "1");
@@ -260,7 +261,7 @@ public class ReportController {
             session.setAttribute("resistFlg", 2);
             session.setAttribute("format", model.getAttribute("lateReasonCd"));
         }
-        format = (String) session.getAttribute("format");
+        format = (String) session.getAttribute("lateReasonCd");
         if ("1".equals(format)) {
             format = "1";
         } else if ("2".equals(format)) {
@@ -270,6 +271,8 @@ public class ReportController {
         model.addAttribute("typeFlg", 1);
 
         model.addAttribute("selectedLineId", model.getAttribute("lineId"));
+        // 存在フラグ
+        model.addAttribute("existsFlg", null);
         return "report";
     }
 }

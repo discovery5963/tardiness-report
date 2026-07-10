@@ -15,11 +15,22 @@
     <title>報告画面</title>
     <!-- 路線・社員名選択用 -->
     <script>
-        $(document).ready(function () {
-            $('#line-select').select2({
-                placeholder: '検索ワードを入力'
-            });
-            $('#format').select2();
+            $(document).ready(function () {
+                $('#line-select').select2({
+                    placeholder: '検索ワードを入力'
+                });
+                $('#format').on('change', function (event) {
+                    const selectedItem = $(this).val();
+
+                    // フォーマット表示改修
+                    if (selectedItem === "train") {
+                        $('#train').removeClass('hidden');
+                        textarea.value = "電車遅延時間：分\r\n現場遅刻時間：分";
+                    } else {
+                        $('#train').addClass('hidden');
+                        textarea.value = "遅刻理由：\r\n到着予定時刻：\r\n業務開始時刻：";
+                    }
+                });
         });
     </script>
 
@@ -97,23 +108,26 @@
 </body>
 
 <script th:inline="javascript">
-    // 登録or確認フラグ
     const typeFlg = [[${ typeFlg }]];
-    // フォーマットフラグ
     const formatFlg = [[${ formatFlg }]];
-    // 存在フラグ
     const existsFlg = [[${ existsFlg }]];
+
     const train = document.getElementById("train");
     const free = document.getElementById("free");
     const report = document.getElementById("report");
     const confirm = document.getElementById("confirm");
 
-    document.getElementById("line-select").addEventListener("change", function () {
-        const selected = this.options[this.selectedIndex];
-        document.getElementById("lineName").value = selected.dataset.lineName;
-    });
+    // フォーマット選択エリア
+    const formatArea = document.querySelector('.format');
 
-    // 登録画面
+    // ① existFlg によるフォーマット選択の表示・非表示（最優先）
+    if (existsFlg == null) {
+        formatArea.classList.add('hidden');   // 更新画面 → 隠す
+    } else {
+        formatArea.classList.remove('hidden'); // 登録画面 → 表示
+    }
+
+    // ② typeFlg による画面切替（existFlg の後に実行）
     if (typeFlg == 1) {
         report.classList.remove("hidden");
         if (formatFlg == 1) {
@@ -121,45 +135,25 @@
         } else {
             free.classList.remove("hidden");
         }
-        // 確認画面
     } else if (typeFlg == 2) {
         confirm.classList.remove("hidden");
         if (formatFlg == 2) {
             train.classList.remove("hidden");
         }
     }
-
-    const menu = document.getElementById('format');
-    menu.addEventListener('change', (event) => {
-        const selectedItem = event.target.value;
-        if (selectedItem == "train") {
-            train.classList.remove("hidden");
-        } else if (selectedItem == "free") {
-            train.classList.add("hidden");
-        }
-    });
-
-    const textarea = document.getElementsByName('inputDetail')[0];
-
-    menu.addEventListener('change', (event) => {
-        const selectedItem = event.target.value;
+    // ③ Select2 の change イベント
+    $('#format').on('change', function () {
+        const selectedItem = $(this).val();
+        const textarea = document.getElementsByName('inputDetail')[0];
 
         if (selectedItem === "train") {
-            train.classList.remove("hidden");
-            textarea.value = "電車遅延時間：分\r\n" + "現場遅刻時間：分";
-        } else if (selectedItem === "free") {
-            train.classList.add("hidden");
-            textarea.value = "遅刻理由：\r\n" + "到着予定時刻：\r\n" + "業務開始時刻：";
-        }
-    });
-    window.addEventListener('load', () => {
-        if (existsFlg == 1) {
-            title.textContent = "連絡更新";
+            $('#train').removeClass('hidden');
+            textarea.value = "電車遅延時間：分\r\n現場遅刻時間：分";
         } else {
-            title.textContent = "連絡登録";
+            $('#train').addClass('hidden');
+            textarea.value = "遅刻理由：\r\n到着予定時刻：\r\n業務開始時刻：";
         }
     });
-
 </script>
 
 </html>
