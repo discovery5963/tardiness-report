@@ -308,10 +308,10 @@ public class SearchDetailController {
                 // 登録日は日付のみを出力する
                 Timestamp ts = dto.getRegisterDate();
                 String dateOnly = ts.toLocalDateTime().toLocalDate().toString(); // yyyy-MM-ddに変換
-
+            
                 writer.println(
-                        dateOnly + "," + dto.getEmpName() + "," + removeLineBreak(dto.getDetail())
-                                + "," + dto.getLineName() + "," + dto.getLateReason());
+                        dateOnly + "," + dto.getEmpName() + "," +  dto.getLateReason()
+                                + "," + dto.getLineName() + "," + removeLineBreak(dto.getDetail()));
             }
 
             writer.flush();

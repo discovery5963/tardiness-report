@@ -1,8 +1,6 @@
 package com.example.tardiness_report.repository;
 
 import com.example.tardiness_report.dto.SearchDetailDto;
-import com.example.tardiness_report.dto.SearchDetailForm;
-
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -89,6 +87,7 @@ public class SearchDetailRepository {
                     EMP_NAME,
                     REGISTER_DATE,
                     LATE_REASON_CD,
+                    LATE_REASON,
                     DETAIL,
                     LINE_NAME
                 FROM
@@ -115,6 +114,7 @@ public class SearchDetailRepository {
             		.empName((String) row.get("EMP_NAME"))
                     .registerDate((Timestamp) row.get("REGISTER_DATE"))
                     .lateReasonCd((String) row.get("LATE_REASON_CD"))
+                    .lateReason((String) row.get("LATE_REASON"))
                     .detail((String) row.get("DETAIL")).lineName((String) row.get("LINE_NAME"))
                     .build();
 
