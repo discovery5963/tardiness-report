@@ -18,12 +18,12 @@ public class MenuController {
     @GetMapping("/menu")
     public String showMenu(Model model, HttpSession session) {
         // ヘッダー情報の格納
-        model.addAttribute("empId", session.getAttribute("empId"));
-        model.addAttribute("empLname", session.getAttribute("empLname"));
-        model.addAttribute("empFname", session.getAttribute("empFname"));
-        model.addAttribute("teamName", session.getAttribute("teamName"));
-        model.addAttribute("unitNo", session.getAttribute("unitNo"));
-        model.addAttribute("roleName", session.getAttribute("roleName"));
+        // model.addAttribute("empId", session.getAttribute("empId"));
+        // model.addAttribute("empLname", session.getAttribute("empLname"));
+        // model.addAttribute("empFname", session.getAttribute("empFname"));
+        // model.addAttribute("teamName", session.getAttribute("teamName"));
+        // model.addAttribute("unitNo", session.getAttribute("unitNo"));
+        // model.addAttribute("roleName", session.getAttribute("roleName"));
 
         return "menu";
     }
