@@ -39,10 +39,6 @@ public class ReportController {
     @RequestMapping("/report")
     public String returnHtml(HttpSession session,
             Model model) {
-        // 動作確認用
-        // session.setAttribute("empId", "0000000002");
-        // session.setAttribute("lateReasonId", "1");
-        boolean errFlg = false;
 
         // 存在フラグ
         model.addAttribute("existsFlg", "0");
@@ -76,7 +72,7 @@ public class ReportController {
         // セッションに遅刻理由IDが含まれている場合、遅刻理由IDから遅刻レコードを検索
         if (!Objects.isNull(session.getAttribute("lateReasonId"))) {
             model.addAttribute("lateReasonId", session.getAttribute("lateReasonId"));
-            errFlg = reportService.getTodayTardinessRecord(model);
+            reportService.getTodayTardinessRecord(model);
             model.addAttribute("inputDetail", model.getAttribute("detail"));
             model.addAttribute("line", model.getAttribute("lineId"));
             session.setAttribute("lineId", model.getAttribute("lineId"));
@@ -93,7 +89,7 @@ public class ReportController {
             model.addAttribute("existsFlg", "1");
             // セッションに遅刻理由IDが含まれていない場合、社員IDから当日の遅刻レコードを検索
         } else {
-            errFlg = reportService.getTardinessRecord(model);
+            reportService.getTardinessRecord(model);
             if (!Objects.isNull(model.getAttribute("detail"))) {
                 session.setAttribute("lateReasonId", model.getAttribute("lateReasonId"));
                 model.addAttribute("inputDetail", model.getAttribute("detail"));
@@ -176,7 +172,6 @@ public class ReportController {
         final String CODE = "遅刻理由コードは：";
         final String LINE = "路線IDは：";
         final String DETAIL = "内容は：";
-        boolean errFlg = true;
         System.out.println("======logStart======");
         System.out.println(ID + empId);
         System.out.println(CODE + format);
@@ -202,12 +197,12 @@ public class ReportController {
         System.out.println(lateReasonCd);
         if (session.getAttribute("resistFlg").equals(1)) {
             // INSERT処理
-            lateReasonRepository.insertLateReason(empId, lateReasonCd, format, lineId, inputDetail);
-            errFlg = reportService.getTardinessRecord(model);
+            lateReasonRepository.insertLateReason(empId, lateReasonCd, "1", lineId, inputDetail);
+            reportService.getTardinessRecord(model);
             session.setAttribute("lateReasonId", model.getAttribute("lateReasonId"));
         } else if (session.getAttribute("resistFlg").equals(2)) {
             // UPDATE処理
-            lateReasonRepository.updateLateReason(lateReasonCd, format, lineId, inputDetail, lateReasonId);
+            lateReasonRepository.updateLateReason(lateReasonCd, "2", lineId, inputDetail, lateReasonId);
         }
         if (!model.getAttribute("format").equals("2")) {
             System.out.println(LINE + lineId);
@@ -239,18 +234,15 @@ public class ReportController {
                 .findFirst()
                 .orElse(null);
         model.addAttribute("lineName", lineName);
-        boolean errFlg = true;
-        String lateReasonId = null;
         if (!Objects.isNull(session.getAttribute("lateReasonId"))) {
             model.addAttribute("lateReasonId", session.getAttribute("lateReasonId"));
-            errFlg = reportService.getTodayTardinessRecord(model);
+            reportService.getTodayTardinessRecord(model);
         } else {
-            errFlg = reportService.getTardinessRecord(model);
+            reportService.getTardinessRecord(model);
         }
         
         if (!Objects.isNull(model.getAttribute("detail"))) {
             session.setAttribute("lateReasonId", model.getAttribute("lateReasonId"));
-            lateReasonId = (String) session.getAttribute("lateReasonId");
             model.addAttribute("inputDetail", model.getAttribute("detail"));
             lineName = lineList.stream()
                     .filter(item -> item.getLineId().equals(model.getAttribute("lineId")))

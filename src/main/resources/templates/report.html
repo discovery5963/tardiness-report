@@ -108,9 +108,9 @@
 </body>
 
 <script th:inline="javascript">
-    const typeFlg = [[${ typeFlg }]];
-    const formatFlg = [[${ formatFlg }]];
-    const existsFlg = [[${ existsFlg }]];
+    const typeFlg = /*[[${typeFlg}]]*/ 0;
+    const formatFlg = /*[[${formatFlg}]]*/ 0;
+    const existsFlg = /*[[${existsFlg}]]*/ 0;
 
     const train = document.getElementById("train");
     const free = document.getElementById("free");

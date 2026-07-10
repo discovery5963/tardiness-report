@@ -40,7 +40,6 @@ public class SearchDetailForm {
     /** 終了ページ件数 */
     private int endPageNumber;
     // DB項目以外（これより↑はすべて別クラスに移動する
-    // TODO
     /** 最後のページ判定フラグ */
     private boolean isLastPage;
     /** 表示件数 */
