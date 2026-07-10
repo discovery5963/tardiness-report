@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Timestamp;
-import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.List;
 
 @Controller
@@ -115,22 +115,40 @@ public class SearchDetailController {
             empID = form.getEmpId();
         }
 
-        // 初期ページ番号を設定
-        form.setCurrentPageNumber(1);
-
+        
         // 開始日・終了日入力チェック（片方しか入力されていない場合エラー）
         if ((form.getStartDate() != null && !form.getStartDate().isEmpty())
-                ^ (form.getEndDate() != null && !form.getEndDate().isEmpty())) {
-            model.addAttribute(ERRORMESSAGE, "日付指定時は開始日付と終了日付はどちらも必須です。");
-            return "search-detail";
-        }
-
+            ^ (form.getEndDate() != null && !form.getEndDate().isEmpty())) {
+        model.addAttribute(ERRORMESSAGE, "日付指定時は開始日付と終了日付はどちらも必須です。");
+        return "search-detail";
+       }
+       // 開始日付が終了日付より後の場合エラー
+       if(form.getStartDate().compareTo(form.getEndDate()) > 0) {
+        model.addAttribute(ERRORMESSAGE, "開始日付は終了日付より後に設定できません。");
+        return "search-detail";
+       }
+       // 終了日付が未来日の場合エラー
+       String sysDateStr = LocalDate.now().toString();
+       if(form.getEndDate() != null && form.getEndDate().compareTo(sysDateStr) > 0) {
+        model.addAttribute(ERRORMESSAGE, "終了日付に未来日は設定できません。");
+        return "search-detail";
+       }
+       
+    
         // 総件数取得
         int allCount =
                 searchDetailRepository.getAllListCount(String.valueOf(session.getAttribute("role")),
                         empID, String.valueOf(session.getAttribute("teamId")), form.getLineId(),
                         form.getStartDate(), form.getEndDate());
         form.setAllDataCount(allCount);
+
+        // 初期ページ番号を設定
+        if(allCount == 0) {
+            // 総件数が0件の場合、ページ番号を0に設定
+            form.setCurrentPageNumber(0);
+        } else {
+            form.setCurrentPageNumber(1);
+        }
 
         // ページング時共通処理
         commonUtil(form, model, session);
@@ -146,6 +164,9 @@ public class SearchDetailController {
         int maxPageNum = (int) Math.ceil((double) form.getAllDataCount() / ITEMS_PER_PAGE);
         form.setMaxPageNumber(maxPageNum);
 
+        // 最後のページ判定
+        boolean isLastPage = form.getCurrentPageNumber() * ITEMS_PER_PAGE >= form.getAllDataCount();
+        form.setLastPage(isLastPage);
 
         model.addAttribute("searchDetailForm", form); // これで十分なはず
         model.addAttribute("resultList", resultList);
@@ -311,7 +332,7 @@ public class SearchDetailController {
             
                 writer.println(
                         dateOnly + "," + dto.getEmpName() + "," +  dto.getLateReason()
-                                + "," + dto.getLineName() + "," + removeLineBreak(dto.getDetail()));
+                                + "," + nullToEmpty(dto.getLineName()) + "," + nullToEmpty(removeLineBreak(dto.getDetail())));
             }
 
             writer.flush();
@@ -334,6 +355,15 @@ public class SearchDetailController {
         }
     }
 
+    /**
+     * nullを空文字に変換するユーティリティメソッド
+     *
+     * @param value 入力値
+     * @return 空文字列または元の値
+     */
+    public String nullToEmpty(String value) {
+        return value == null ? "" : value;
+    }
 
     /**
      * 共通処理：ページネーション時共通処理
@@ -360,8 +390,7 @@ public class SearchDetailController {
 
         String viewingDataCount = startIndex + "〜" + endIndex + "件";
         form.setViewingDataCount(viewingDataCount);
-
-
     }
+
 
 }

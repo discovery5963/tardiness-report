@@ -44,7 +44,6 @@ public class SearchDetailRepository {
                     1 = 1
                 """;
 
-
         sql = setCriteria(sql, role, empID, teamId, lineId, startDate, endDate);
 
         int allCount = jdbcTemplate.queryForObject(sql, int.class);
@@ -101,6 +100,10 @@ public class SearchDetailRepository {
 
         // CSV出力でない場合はページングのためのLIMITとOFFSETを追加
         if (!isCsvOutput) {
+            // 総件数が0件の場合の防御措置（オフセットの計算の為）
+            if(currentPageNumber == 0) {
+                currentPageNumber = 1;
+            }
             // オフセットの計算
             int offsetValue = (currentPageNumber - 1) * limitCount;
             sql += " LIMIT %d OFFSET %d".formatted(limitCount, offsetValue);

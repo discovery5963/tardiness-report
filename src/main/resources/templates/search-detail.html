@@ -101,7 +101,7 @@
 
 
         <!-- 初期表示＝falseの場合のみ表示 -->
-        <table class='page_link' th:if="${!isInitial}">
+        <table class='page_link' th:if="${isInitial == false}">
           <tr>
             <!-- 表示件数 -->
             <td><div class="left-align" style="display: inline-block;" th:text="${searchDetailForm.viewingDataCount}"></div>/
@@ -112,7 +112,7 @@
             <td>
               <!-- 前へボタン押下時の処理 -->
               <div class="right-align">
-                  <input type="submit" id="previousPage" name="goPrevious" value="◀" class="btn btn-secondary" th:disabled="${searchDetailForm.currentPageNumber == 1}"/>
+                  <input type="submit" id="previousPage" name="goPrevious" value="◀" class="btn btn-secondary" th:disabled="${searchDetailForm.currentPageNumber == 1 || searchDetailForm.currentPageNumber == 0}"/>
                   <!-- <input type="hidden" id="screen" name="screen" value="検索・参照画面" /> -->
                   <input type="hidden" name="currentPageNumber" th:value="${searchDetailForm.currentPageNumber}"/>
                   <input type="hidden" id="action" name="action" value="prev"/>
@@ -126,7 +126,7 @@
             <td>
               <!-- 次へボタン押下時の処理 -->
               <div class="right-align">
-                  <input type="submit" id="nextPage" name="goNext" value="▶" class="btn btn-secondary" th:disabled="${searchDetailForm.lastPage}" />
+                  <input type="submit" id="nextPage" name="goNext" value="▶" class="btn btn-secondary" th:disabled="${searchDetailForm.currentPageNumber == 0 || searchDetailForm.lastPage}" />
                   <input type="hidden" id="screen" name="screen" value="検索・参照画面" />
                   <input type="hidden" name="currentPageNumber" th:value="${searchDetailForm.currentPageNumber}" />
                   <input type="hidden" id="action" name="action" value= "next"/>
@@ -139,7 +139,7 @@
         <!-- 初期表示＝falseの場合のみ表示 -->
       
         <!-- 初期表示＝falseの場合のみ表示 -->
-        <table class='search_results' th:if="${!isInitial}">
+        <table class='search_results' th:if="${isInitial == false}">
             <thead>
             <tr>
                 <th>日付</th>
@@ -159,7 +159,7 @@
                     <span th:case="'2'">その他</span>
                 </td>
                 <td th:text="${item.lineName}"></td>
-                <td th:text="${item.detail}"></td>
+                <td th:text="${item.detail}" style="text-align: left;"></td>
                 <input type="hidden" id="lateReasonId" name="lateReasonId" th:value="${item.lateReasonId}" />
                 <td><button type="submit" name="doEdit">編集</button></td>
             </tr>
