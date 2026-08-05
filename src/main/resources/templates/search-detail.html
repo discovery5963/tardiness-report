@@ -181,22 +181,13 @@
 
             function updateState() {
 
-                // ① その他チェック → select2 を完全に触れない状態にする
                 if (checkbox.checked) {
-
-                    // 値をクリア
                     $('#line-select').val(null).trigger('change');
-
-                    // select2 UI を破棄（これが最重要）
                     $('#line-select').select2('destroy');
-
-                    // 本体の select を disable
                     $('#line-select').prop('disabled', true);
-
                     return;
                 }
 
-                // ② その他チェック解除 → select2 を再初期化して復活
                 $('#line-select').prop('disabled', false);
 
                 $('#line-select').select2({
