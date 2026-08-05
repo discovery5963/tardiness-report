@@ -33,9 +33,9 @@ public class EmployeeMstRepository {
                 FROM employee_mst emp
                 INNER JOIN password_mst pass
                     ON emp.emp_id = pass.emp_id
-                LEFT JOIN TardinessReport.team_mst team
+                LEFT JOIN team_mst team
                     ON emp.team_id = team.team_id
-                LEFT JOIN TardinessReport.role_mst role
+                LEFT JOIN role_mst role
                     ON emp.role = role.role
                 WHERE emp.emp_id = '""" + empID + "'";
 
@@ -63,17 +63,21 @@ public class EmployeeMstRepository {
      */
     public List<UserDataDto> getEmpDataForSearchDetail(String unitNo, String teamId, String role) {
 
-        String sql = """
-                SELECT
-                    EMP_ID,
-                    EMP_NAME
-                FROM 
-                    SEARCH_LIST_VIEW
-                WHERE
-                    1 = 1
-                """;
-
         // 「社員名称｣検索処理((管理職付きの場合のみ実行する。)
+
+        String sql = """
+            SELECT
+                EMP_ID,
+                EMP_NAME
+            FROM (
+                SELECT DISTINCT ON (EMP_NAME)
+                    EMP_ID,
+                    EMP_NAME,
+                    ROLE
+                FROM SEARCH_LIST_VIEW
+                WHERE 1 = 1
+            """;
+
         // 下記条件に合致しない社員は全社員参照可能とする。
         
         // 'セッション.社員ID'に紐づく、社員マスタ.役職=2,3の場合(C/LD)の場合
@@ -90,7 +94,15 @@ public class EmployeeMstRepository {
             sql = sql + " AND (ROLE NOT IN ('1') OR UNIT_NO = '" + unitNo + "')";
         }
 
-        sql += " ORDER BY ROLE DESC, EMP_NAME ASC ";
+        // SQLを結合
+        sql = sql + """
+                ORDER BY
+                    EMP_NAME ASC
+            ) sub
+            ORDER BY
+                ROLE DESC,
+                EMP_NAME ASC
+            """;
 
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
         List<UserDataDto> result = new ArrayList<>();
