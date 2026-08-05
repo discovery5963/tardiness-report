@@ -99,7 +99,6 @@
            </div>
         </fieldset>
 
-
         <!-- 初期表示＝falseの場合のみ表示 -->
         <table class='page_link' th:if="${isInitial == false}">
           <tr>
@@ -161,11 +160,12 @@
                 <td th:text="${item.lineName}"></td>
                 <td th:text="${item.detail}" style="text-align: left;"></td>
                 <td>
-                    <div th:if="${(empLname + empFname) == item.empName 
-                        && #temporals.format(item.registerDate.toLocalDateTime(), 'yyyy-MM-dd') == #dates.format(#dates.createNow(), 'yyyy-MM-dd')} ">
+                    <div class="edit-block"
+                        th:data-emp-name="${item.empName}"
+                        th:data-register-date="${#temporals.format(item.registerDate.toLocalDateTime(), 'yyyy-MM-dd')}">
                         <form action="/search" method="post">
                             <input type="hidden" id="lateReasonId" name="lateReasonId" th:value="${item.lateReasonId}" />
-                            <button type="submit" name="doEdit">編集</button>
+                            <button type="submit" id="editButton" name="doEdit">編集</button>
                         </form>
                     </div>
                 </td>
@@ -175,36 +175,67 @@
         <!-- 初期表示＝falseの場合のみ表示 -->
         </form>
         <script>
-            const option = document.getElementById('line-select');
-            const checkbox = document.getElementById('islineOthers');
+            $(document).ready(function() {
 
-            function updateState() {
+                const checkbox = document.getElementById('islineOthers');
 
-                // ① checkbox が選択された → option をクリアして非活性
-                if (checkbox.checked) {
-                    const selectedOption = option.options[option.selectedIndex];
-                    selectedOption.removeAttribute("selected");
-                    option.selectedIndex = 0;
-                    option.disabled = true;
-                    checkbox.disabled = false;
-                    return;
+                function updateState() {
+
+                    if (checkbox.checked) {
+                        $('#line-select').val(null).trigger('change');
+                        $('#line-select').select2('destroy');
+                        $('#line-select').prop('disabled', true);
+                        return;
+                    }
+
+                    $('#line-select').prop('disabled', false);
+
+                    $('#line-select').select2({
+                        placeholder: '検索ワードを入力',
+                        allowClear: true,
+                        width: '100%'
+                    });
                 }
 
-                // ② option が選択された → checkbox を非活性
-                if (option.value !== "") {
-                    checkbox.disabled = true;
-                    option.disabled = false;
-                    return;
+                // 初期状態反映
+                updateState();
+
+                // イベント登録
+                checkbox.addEventListener('change', updateState);
+
+            });
+
+            document.addEventListener("DOMContentLoaded", function() {
+
+                function convertSlashDateToHyphen(dateStr) {
+                    return dateStr.replace(/\//g, '-'); // 日付のフォーマットを「yyyy/MM/dd」 から 「yyyy-MM-dd」へ変換
                 }
 
-                // ③ option が空 & checkbox 未選択 → 両方活性
-                option.disabled = false;
-                checkbox.disabled = false;
-            }
+                document.querySelectorAll('.edit-block').forEach(block => {
 
-            updateState();
-            option.addEventListener('change', updateState);
-            checkbox.addEventListener('input', updateState);
+                    const button = block.querySelector('#editButton');
+
+                    // ログインユーザー情報
+                    const itemRegisterDate = convertSlashDateToHyphen(block.dataset.registerDate);
+                    const empFullName = "[[${empLname}]]" + "[[${empFname}]]";
+                    
+                    const itemEmpName = block.dataset.empName;
+                    
+                    const today = new Date().toISOString().slice(0, 10);
+
+                    // 編集ボタンの活性、非活性を判別する
+                    const condition =
+                        empFullName === itemEmpName &&
+                        itemRegisterDate === today;
+
+                    if (condition) {
+                        button.disabled = false;   // 活性
+                    } else {
+                        button.disabled = true;    // 非活性
+                    }
+
+                });
+            });
         </script>
     </body>
 </html>
