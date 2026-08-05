@@ -25,14 +25,16 @@ public class SearchDetailRepository {
      * @param role ログインユーザーの役職
      * @param empID 検索対象の従業員ID
      * @param teamId 検索対象のチームID
+     * @param unitNo ログインユーザーのユニット番号
      * @param lineId 検索対象の路線ID
+     * @param islineOthers 電車遅延かその他かを判定するフラグ
      * @param startDate 検索対象の開始日付（登録日）
      * @param endDate 検索対象の終了日付（登録日）
      * @return 検索結果の総件数
      * @throws org.springframework.dao.DataAccessException JDBC 操作に失敗した場合にスローされる
      */
-    public int getAllListCount(String role, String empID, String teamId, String lineId,
-            String startDate, String endDate) {
+    public int getAllListCount(String role, String empID, String teamId, String unitNo, String lineId,
+            boolean islineOthers, String startDate, String endDate) {
 
         // 検索SQL（全件検索状態）
         String sql = """
@@ -44,7 +46,7 @@ public class SearchDetailRepository {
                     1 = 1
                 """;
 
-        sql = setCriteria(sql, role, empID, teamId, lineId, startDate, endDate);
+        sql = setCriteria(sql, role, empID, teamId, unitNo, lineId, islineOthers, startDate, endDate);
 
         int allCount = jdbcTemplate.queryForObject(sql, int.class);
 
@@ -57,17 +59,19 @@ public class SearchDetailRepository {
      * @param role ログインユーザーの役職
      * @param empID 検索対象の従業員ID（null不可）
      * @param teamId 検索対象のチームID
+     * @param unitNo ログインユーザーのユニット番号
      * @param startDate 検索対象の開始日付（登録日）。nullまたは空文字の場合は条件に含めない
      * @param endDate 検索対象の終了日付（登録日）。nullまたは空文字の場合は条件に含めない
      * @param lineId 検索対象の路線ID。
+     * @param islineOthers 電車遅延かその他かを判定するフラグ
      * @param limitCount 取得する最大件数（ページサイズ）
      * @param currentPageNumber 現在のページ番号（1から開始）
      * @param isCsvOutput CSV出力フラグ。trueの場合は全件取得、falseの場合はページングして取得
      * @return SearchDetailDto のリスト。該当なしの場合は空リストを返す。
      * @throws org.springframework.dao.DataAccessException JDBC 操作に失敗した場合にスローされる
      */
-    public List<SearchDetailDto> getResultList(String role, String empID, String teamId,
-            String startDate, String endDate, String lineId, int limitCount, int currentPageNumber,
+    public List<SearchDetailDto> getResultList(String role, String empID, String teamId, String unitNo,
+            String startDate, String endDate, String lineId, boolean islineOthers, int limitCount, int currentPageNumber,
             boolean isCsvOutput) {
 
 
@@ -82,7 +86,6 @@ public class SearchDetailRepository {
         // SQLクエリの作成
         String sql = """
                 SELECT
-                    LATE_REASON_ID,
                     EMP_NAME,
                     REGISTER_DATE,
                     LATE_REASON_CD,
@@ -96,10 +99,10 @@ public class SearchDetailRepository {
                 """;
 
         // SQLクエリに条件を追加
-        sql = setCriteria(sql, role, empID, teamId, lineId, startDate, endDate);
+        sql = setCriteria(sql, role, empID, teamId, unitNo, lineId, islineOthers, startDate, endDate);
 
         // sqlの取得順序を最新から降順に設定
-        sql = sql + " ORDER BY REGISTER_DATE DESC";
+        sql = sql + " ORDER BY REGISTER_DATE DESC, EMP_NAME ASC ";
 
         // CSV出力でない場合はページングのためのLIMITとOFFSETを追加
         if (!isCsvOutput) {
@@ -137,12 +140,14 @@ public class SearchDetailRepository {
      * @param role ログインユーザーの役職
      * @param empID 検索対象の従業員ID
      * @param teamId 検索対象のチームID
+     * @param unitNo ログインユーザーのユニット番号
      * @param lineId 検索対象の路線ID
+     * @param islineOthers 電車遅延かその他かを判定するフラグ
      * @param startDate 検索対象の開始日付（登録日）
      * @param endDate 検索対象の終了日付（登録日）
      * @return 条件を追加したSQLクエリ
      */
-    public String setCriteria(String sql, String role, String empID, String teamId, String lineId,
+    public String setCriteria(String sql, String role, String empID, String teamId, String unitNo, String lineId, boolean islineOthers,
             String startDate, String endDate) {
 
 
@@ -156,6 +161,11 @@ public class SearchDetailRepository {
             sql = sql + " AND LINE_ID = '" + lineId + "'";
         }
 
+        // 路線(その他)にチェックがついている場合
+        if (islineOthers) {
+            sql = sql + " AND LATE_REASON_CD = '2'";
+        }
+
         // 開始日付、終了日付に値がある場合
         if ((startDate != null && !startDate.isEmpty())
                 && (endDate != null && !endDate.isEmpty())) {
@@ -164,14 +174,22 @@ public class SearchDetailRepository {
         }
 
         // ｢遅刻理由｣検索処理(管理職付きの場合)
-        // 'セッション.社員ID'に紐づく、社員マスタ.役職=2,3,4の場合(C以上MGR以下)
-        if (role.equals("2") || role.equals("3") || role.equals("4")) {
+        // 'セッション.社員ID'に紐づく、社員マスタ.役職=2,3の場合(C/LD)の場合
+        // 自チーム（自セクション）を参照できる。
+        if (role.equals("2") || role.equals("3") ) {
             sql = sql + " AND TEAM_ID = '" + teamId + "'";
         }
 
+         // 'セッション.社員ID'に紐づく、社員マスタ.役職=4(AMG)の場合
+         // 自ユニットを参照できる。
+        if (role.equals("4") ) {
+            sql = sql + " AND UNIT_NO = '" + unitNo + "'";
+        }
+
         // 'セッション.社員ID'に紐づく、社員マスタ.役職=5(MGR)の場合
+        // 管理職者(自ユニット以外も含む)または自ユニットを参照できる。
         if (role.equals("5")) {
-            sql = sql + " AND (TEAM_ID = '" + teamId + "' OR ROLE != '1')";
+            sql = sql + " AND (ROLE NOT IN ('1') OR UNIT_NO = '" + unitNo + "')";
         }
         return sql;
     }

@@ -65,57 +65,40 @@ public class EmployeeMstRepository {
 
         String sql = """
                 SELECT
-                    emp.emp_id,
-                    emp.department_id,
-                    emp.team_id,
-                    emp.role,
-                    emp.emp_lname,
-                    emp.emp_fname,
-                    emp.belong,
-                    pass.password,
-                    dep.department_name,
-                    team.team_name
-                FROM employee_mst emp
-                INNER JOIN password_mst pass
-                ON emp.emp_id = pass.emp_id
-                INNER JOIN department_mst dep
-                ON emp.department_id = dep.department_id
-                LEFT JOIN TardinessReport.team_mst team
-                ON emp.team_id = team.team_id
+                    EMP_ID,
+                    EMP_NAME
+                FROM 
+                    SEARCH_LIST_VIEW
                 WHERE
                     1 = 1
                 """;
 
         // 「社員名称｣検索処理((管理職付きの場合のみ実行する。)
+        // 下記条件に合致しない社員は全社員参照可能とする。
+        
         // 'セッション.社員ID'に紐づく、社員マスタ.役職=2,3の場合(C/LD)の場合
+        // 自チーム（自セクション）を参照できる。
         if (role.equals("2") || role.equals("3")) {
-            sql = sql + " AND  emp.TEAM_ID = '" + teamId + "'";
+            sql = sql + " AND TEAM_ID = '" + teamId + "'";
+            // 'セッション.社員ID'に紐づく、社員マスタ.役職=4(AMG)の場合
+            // 自ユニットを参照できる。
+        } else if (role.equals("4")) {
+            sql = sql + " AND  UNIT_NO = '" + unitNo + "'";
+            // 'セッション.社員ID'に紐づく、社員マスタ.役職=5(MGR)の場合
+            // 管理職者(自ユニット以外も含む)または自ユニットを参照できる。
+        } else if (role.equals("5")) {
+            sql = sql + " AND (ROLE NOT IN ('1') OR UNIT_NO = '" + unitNo + "')";
         }
 
-        // 'セッション.社員ID'に紐づく、社員マスタ.役職=4(AMG)の場合
-        // TODO:AMGとMGRの違いを確認
-        if (role.equals("4")) {
-            sql = sql + " AND  team.UNIT_NO = '" + unitNo + "'";
-        }
-
-        // 'セッション.社員ID'に紐づく、社員マスタ.役職=5(MGR)の場合
-        if (role.equals("5")) {
-            sql = sql + " AND  team.UNIT_NO = '" + unitNo + "'";
-        }
-
-        sql += " ORDER BY ROLE DESC, (EMP_LNAME || EMP_FNAME) ASC ";
+        sql += " ORDER BY ROLE DESC, EMP_NAME ASC ";
 
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
         List<UserDataDto> result = new ArrayList<>();
 
         for (Map<String, Object> row : rows) {
-            UserDataDto dto = UserDataDto.builder().empId((String) row.get("emp_id"))
-                    .departmentId((String) row.get("department_id"))
-                    .teamId((String) row.get("team_id")).empLname((String) row.get("emp_lname"))
-                    .empFname((String) row.get("emp_fname")).belong((String) row.get("belong"))
-                    .password((String) row.get("password"))
-                    .departmentName((String) row.get("department_name"))
-                    .teamName((String) row.get("team_name")).role((String) row.get("role")).build();
+            UserDataDto dto = UserDataDto.builder().empId((String) row.get("EMP_ID"))
+                    .empName((String) row.get("EMP_NAME"))
+                    .build();
             result.add(dto);
         }
 

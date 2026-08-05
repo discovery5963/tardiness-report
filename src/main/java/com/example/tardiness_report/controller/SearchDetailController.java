@@ -140,7 +140,7 @@ public class SearchDetailController {
         // 総件数取得
         int allCount =
                 searchDetailRepository.getAllListCount(String.valueOf(session.getAttribute("role")),
-                        empID, String.valueOf(session.getAttribute("teamId")), form.getLineId(),
+                        empID, String.valueOf(session.getAttribute("teamId")), String.valueOf(session.getAttribute("unitNo")), form.getLineId(), form.isIslineOthers(),
                         form.getStartDate(), form.getEndDate());
         form.setAllDataCount(allCount);
 
@@ -158,8 +158,8 @@ public class SearchDetailController {
         // 表示用にページングされたリストを取得
         List<SearchDetailDto> resultList =
                 searchDetailRepository.getResultList(String.valueOf(session.getAttribute("role")),
-                        empID, String.valueOf(session.getAttribute("teamId")), form.getStartDate(),
-                        form.getEndDate(), form.getLineId(), ITEMS_PER_PAGE,
+                        empID, String.valueOf(session.getAttribute("teamId")), String.valueOf(session.getAttribute("unitNo")), form.getStartDate(),
+                        form.getEndDate(), form.getLineId(), form.isIslineOthers(), ITEMS_PER_PAGE,
                         form.getCurrentPageNumber(), isCsvOutput);
 
         // 最大ページ番号計算
@@ -209,8 +209,8 @@ public class SearchDetailController {
         // 表示用にページングされたリストを取得
         List<SearchDetailDto> resultList =
                 searchDetailRepository.getResultList(String.valueOf(session.getAttribute("role")),
-                        empID, String.valueOf(session.getAttribute("teamId")), form.getStartDate(),
-                        form.getEndDate(), form.getLineId(), ITEMS_PER_PAGE,
+                        empID, String.valueOf(session.getAttribute("teamId")), String.valueOf(session.getAttribute("unitNo")), form.getStartDate(),
+                        form.getEndDate(), form.getLineId(), form.isIslineOthers(), ITEMS_PER_PAGE,
                         form.getCurrentPageNumber(), isCsvOutput);
 
         model.addAttribute("searchDetailForm", form);
@@ -256,8 +256,8 @@ public class SearchDetailController {
         // 表示用にページングされたリストを取得
         List<SearchDetailDto> resultList =
                 searchDetailRepository.getResultList(String.valueOf(session.getAttribute("role")),
-                        empID, String.valueOf(session.getAttribute("teamId")), form.getStartDate(),
-                        form.getEndDate(), form.getLineId(), ITEMS_PER_PAGE,
+                        empID, String.valueOf(session.getAttribute("teamId")), String.valueOf(session.getAttribute("unitNo")), form.getStartDate(),
+                        form.getEndDate(), form.getLineId(), form.isIslineOthers(), ITEMS_PER_PAGE,
                         form.getCurrentPageNumber(), isCsvOutput);
 
         model.addAttribute("searchDetailForm", form);
@@ -312,8 +312,8 @@ public class SearchDetailController {
         // CSV出力
         List<SearchDetailDto> resultList =
                 searchDetailRepository.getResultList(String.valueOf(session.getAttribute("role")),
-                        empID, String.valueOf(session.getAttribute("teamId")), form.getStartDate(),
-                        form.getEndDate(), form.getLineId(), ITEMS_PER_PAGE,
+                        empID, String.valueOf(session.getAttribute("teamId")), String.valueOf(session.getAttribute("unitNo")), form.getStartDate(),
+                        form.getEndDate(), form.getLineId(), form.isIslineOthers(), ITEMS_PER_PAGE,
                         form.getCurrentPageNumber(), isCsvOutput);
 
         try {

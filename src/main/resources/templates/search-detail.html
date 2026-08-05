@@ -77,7 +77,7 @@
                          <option
                              th:each="item : ${employeeList}"
                              th:value="${item.empId}"
-                             th:text="${item.empLname + ' ' + item.empFname}"
+                             th:text="${item.empName}"
                              th:selected="${item.empId == searchDetailForm.empId}">
                          </option>
                      </select>
