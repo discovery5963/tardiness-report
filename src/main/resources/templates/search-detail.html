@@ -175,36 +175,44 @@
         <!-- 初期表示＝falseの場合のみ表示 -->
         </form>
         <script>
-            const option = document.getElementById('line-select');
+        $(document).ready(function() {
+
             const checkbox = document.getElementById('islineOthers');
 
             function updateState() {
 
-                // ① checkbox が選択された → option をクリアして非活性
+                // ① その他チェック → select2 を完全に触れない状態にする
                 if (checkbox.checked) {
-                    const selectedOption = option.options[option.selectedIndex];
-                    selectedOption.removeAttribute("selected");
-                    option.selectedIndex = 0;
-                    option.disabled = true;
-                    checkbox.disabled = false;
+
+                    // 値をクリア
+                    $('#line-select').val(null).trigger('change');
+
+                    // select2 UI を破棄（これが最重要）
+                    $('#line-select').select2('destroy');
+
+                    // 本体の select を disable
+                    $('#line-select').prop('disabled', true);
+
                     return;
                 }
 
-                // ② option が選択された → checkbox を非活性
-                if (option.value !== "") {
-                    checkbox.disabled = true;
-                    option.disabled = false;
-                    return;
-                }
+                // ② その他チェック解除 → select2 を再初期化して復活
+                $('#line-select').prop('disabled', false);
 
-                // ③ option が空 & checkbox 未選択 → 両方活性
-                option.disabled = false;
-                checkbox.disabled = false;
+                $('#line-select').select2({
+                    placeholder: '検索ワードを入力',
+                    allowClear: true,
+                    width: '100%'
+                });
             }
 
+            // 初期状態反映
             updateState();
-            option.addEventListener('change', updateState);
-            checkbox.addEventListener('input', updateState);
+
+            // イベント登録
+            checkbox.addEventListener('change', updateState);
+
+        });
         </script>
     </body>
 </html>
